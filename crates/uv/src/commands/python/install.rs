@@ -541,7 +541,7 @@ fn create_bin_links(
         match installation.create_bin_link(&target) {
             Ok(()) => {
                 dbg!(
-                    "Installed executable for `{:?}`",// at `{:?}` for {:?}",
+                    "Installed executable for `{:?}`", // at `{:?}` for {:?}",
                     // target.simplified_display(),
                     installation.key(),
                 );
@@ -682,7 +682,7 @@ fn create_bin_links(
 
                 installation.create_bin_link(&target)?;
                 dbg!(
-                    "Updated executable to `{:?}`",// at `{}` to {}",
+                    "Updated executable to `{:?}`", // at `{}` to {}",
                     // target.simplified_display(),
                     installation.key(),
                 );

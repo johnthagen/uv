@@ -3,7 +3,7 @@
 use std::env::consts::EXE_SUFFIX;
 use std::io;
 use std::io::{BufWriter, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use fs_err as fs;
 use fs_err::File;
@@ -150,12 +150,17 @@ pub(crate) fn create(
 
     // FIXME: In unix use symlink
     // Per PEP 405, the Python `home` is the parent directory of the interpreter.
-    let python_home = base_python.parent().ok_or_else(|| {
-        io::Error::new(
-            io::ErrorKind::NotFound,
-            "The Python interpreter needs to have a parent directory",
-        )
-    })?;
+    // FIXME: Doc
+    let python_home = interpreter.to_base_python_or_symlink_path()?
+        .parent()
+        .ok_or_else(|| {
+            io::Error::new(
+                io::ErrorKind::NotFound,
+                "The Python interpreter needs to have a parent directory",
+            )
+        })?
+        .to_path_buf();
+    let python_home = python_home.as_path();
 
     // Different names for the python interpreter
     fs::create_dir_all(&scripts)?;
@@ -166,25 +171,8 @@ pub(crate) fn create(
     {
         dbg!("|||||||| base_python: {:?}", &base_python);
         // FIXME: Doc
-        let executable_target = if interpreter.is_standalone() {
-            // FIXME: Check that there is a `bin` parent and a parent of that
-            base_python.parent().unwrap().parent().unwrap().parent().unwrap()
-                .join(format!(
-                    "python{}.{}",
-                    interpreter.python_major(),
-                    interpreter.python_minor(),
-                ))
-                .join("bin")
-                .join(format!(
-                "python{}.{}",
-                interpreter.python_major(),
-                interpreter.python_minor(),
-            ))
-        } else {
-            base_python.clone()
-        };
+        let executable_target = interpreter.to_base_python_or_symlink_path()?;
         uv_fs::replace_symlink(&executable_target, &executable)?;
-        dbg!("created dir link {:?} <- {:?}", &executable_target, &executable);
         // uv_fs::replace_symlink(&base_python, &executable)?;
         uv_fs::replace_symlink(
             "python",
@@ -348,6 +336,11 @@ pub(crate) fn create(
         fs::write(scripts.join(name), activator)?;
     }
 
+    dbg!("Writing home key: {:?}", &python_home);
+    dbg!(
+        "Writing version key: {:?}",
+        &interpreter.markers().python_version()
+    );
     let mut pyvenv_cfg_data: Vec<(String, String)> = vec![
         (
             "home".to_string(),
@@ -363,7 +356,7 @@ pub(crate) fn create(
         ("uv".to_string(), version().to_string()),
         (
             "version_info".to_string(),
-            interpreter.markers().python_full_version().string.clone(),
+            interpreter.markers().python_version().string.clone(),
         ),
         (
             "include-system-site-packages".to_string(),

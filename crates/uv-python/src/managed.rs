@@ -519,18 +519,17 @@ impl ManagedPythonInstallation {
                     );
                 }
                 // FIXME: Update these errors!
-                _ => {}
-                // Err(err) if err.kind() == io::ErrorKind::NotFound => {
-                //     return Err(Error::MissingExecutable(python.clone()))
-                // }
-                // Err(err) if err.kind() == io::ErrorKind::AlreadyExists => {}
-                // Err(err) => {
-                //     return Err(Error::CanonicalizeExecutable {
-                //         from: executable,
-                //         to: python,
-                //         err,
-                //     })
-                // }
+                _ => {} // Err(err) if err.kind() == io::ErrorKind::NotFound => {
+                        //     return Err(Error::MissingExecutable(python.clone()))
+                        // }
+                        // Err(err) if err.kind() == io::ErrorKind::AlreadyExists => {}
+                        // Err(err) => {
+                        //     return Err(Error::CanonicalizeExecutable {
+                        //         from: executable,
+                        //         to: python,
+                        //         err,
+                        //     })
+                        // }
             };
         }
 
@@ -618,7 +617,11 @@ impl ManagedPythonInstallation {
 
         if cfg!(unix) {
             // Note this will never copy on Unix — we use it here to allow compilation on Windows
-            dbg!("[creaet_bin_link...] symlink_or_copy_file: {:?} <- {:?}", &python, &target);
+            dbg!(
+                "[creaet_bin_link...] symlink_or_copy_file: {:?} <- {:?}",
+                &python,
+                &target
+            );
             match symlink_or_copy_file(&python, target) {
                 Ok(()) => Ok(()),
                 Err(err) if err.kind() == io::ErrorKind::NotFound => {
