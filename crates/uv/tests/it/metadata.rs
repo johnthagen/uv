@@ -19,6 +19,7 @@ fn version_get() -> Result<()> {
         requires-python = ">=3.12"
         "#,
     )?;
+
     uv_snapshot!(context.filters(), context.metadata_version(), @r"
     success: true
     exit_code: 0
@@ -27,6 +28,56 @@ fn version_get() -> Result<()> {
 
     ----- stderr -----
     ");
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r#"
+    [project]
+    name = "myproject"
+    version = "1.10.31"
+    requires-python = ">=3.12"
+    "#
+    );
+    Ok(())
+}
+
+// Print the version (--short)
+#[test]
+fn version_get_short() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(
+        r#"
+        [project]
+        name = "myproject"
+        version = "1.10.31"
+        requires-python = ">=3.12"
+        "#,
+    )?;
+
+    uv_snapshot!(context.filters(), context.metadata_version()
+        .arg("--short"), @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    1.10.31
+
+    ----- stderr -----
+    ");
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r#"
+    [project]
+    name = "myproject"
+    version = "1.10.31"
+    requires-python = ">=3.12"
+    "#
+    );
+
     Ok(())
 }
 
@@ -69,6 +120,46 @@ requires-python = ">=3.12"
     Ok(())
 }
 
+// Set the version (--short)
+#[test]
+fn version_set_value_short() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(
+        r#"
+[project]
+name = "myproject"
+version = "1.10.31"
+requires-python = ">=3.12"
+"#,
+    )?;
+
+    uv_snapshot!(context.filters(), context.metadata_version()
+        .arg("1.1.1")
+        .arg("--short"), @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    1.1.1
+
+    ----- stderr -----
+    ");
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r###"
+    [project]
+    name = "myproject"
+    version = "1.1.1"
+    requires-python = ">=3.12"
+    "###
+    );
+
+    Ok(())
+}
+
 // Bump patch version
 #[test]
 fn version_bump_patch() -> Result<()> {
@@ -90,6 +181,45 @@ requires-python = ">=3.12"
     exit_code: 0
     ----- stdout -----
     myproject 1.10.31 => 1.10.32
+
+    ----- stderr -----
+    ");
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r#"
+    [project]
+    name = "myproject"
+    version = "1.10.32"
+    requires-python = ">=3.12"
+    "#
+    );
+    Ok(())
+}
+
+// Bump patch version (--short)
+#[test]
+fn version_bump_patch_short() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(
+        r#"
+[project]
+name = "myproject"
+version = "1.10.31"
+requires-python = ">=3.12"
+"#,
+    )?;
+
+    uv_snapshot!(context.filters(), context.metadata_version()
+        .arg("--bump").arg("patch")
+        .arg("--short"), @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    1.10.32
 
     ----- stderr -----
     ");

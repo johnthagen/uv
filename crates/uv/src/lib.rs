@@ -1032,8 +1032,11 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                     value,
                     bump,
                     dry_run,
+                    short,
                 }),
-        }) => commands::metadata_version(value, bump, dry_run, &workspace_cache, printer).await,
+        }) => {
+            commands::metadata_version(value, bump, dry_run, short, &workspace_cache, printer).await
+        }
         Commands::Version { output_format } => {
             commands::version(output_format, &mut stdout())?;
             Ok(ExitStatus::Success)

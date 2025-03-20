@@ -22,6 +22,7 @@ pub(crate) async fn metadata_version(
     value: Option<String>,
     bump: Option<VersionBump>,
     dry_run: bool,
+    short: bool,
     cache: &WorkspaceCache,
     printer: Printer,
 ) -> Result<ExitStatus> {
@@ -36,13 +37,13 @@ pub(crate) async fn metadata_version(
         .project
         .as_ref()
         .map(|project| &project.name);
-    let current_version = pyproject.version()?;
+    let old_version = pyproject.version()?;
 
     // Figure out new metadata
     let new_version = if let Some(value) = value {
         Some(Version::from_str(&value)?)
     } else if let Some(bump) = bump {
-        Some(bumped_version(&current_version, bump, printer)?)
+        Some(bumped_version(&old_version, bump, printer)?)
     } else {
         None
     };
@@ -58,17 +59,23 @@ pub(crate) async fn metadata_version(
 
     // Report the results
     if let Some(name) = name {
-        write!(printer.stdout(), "{name} ")?;
+        if !short {
+            write!(printer.stdout(), "{name} ")?;
+        }
     }
     if let Some(new_version) = new_version {
-        writeln!(
-            printer.stdout(),
-            "{} => {}",
-            current_version.cyan(),
-            new_version.cyan()
-        )?;
+        if short {
+            writeln!(printer.stdout(), "{}", new_version.cyan(),)?;
+        } else {
+            writeln!(
+                printer.stdout(),
+                "{} => {}",
+                old_version.cyan(),
+                new_version.cyan()
+            )?;
+        }
     } else {
-        writeln!(printer.stdout(), "{}", current_version.cyan(),)?;
+        writeln!(printer.stdout(), "{}", old_version.cyan(),)?;
     }
     Ok(ExitStatus::Success)
 }

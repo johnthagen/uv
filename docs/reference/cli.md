@@ -9756,6 +9756,8 @@ uv metadata version [OPTIONS] [VALUE]
 
 </dd><dt id="uv-metadata-version--quiet"><a href="#uv-metadata-version--quiet"><code>--quiet</code></a>, <code>-q</code></dt><dd><p>Do not print any output</p>
 
+</dd><dt id="uv-metadata-version--short"><a href="#uv-metadata-version--short"><code>--short</code></a></dt><dd><p>Only print the final value</p>
+
 </dd><dt id="uv-metadata-version--verbose"><a href="#uv-metadata-version--verbose"><code>--verbose</code></a>, <code>-v</code></dt><dd><p>Use verbose output.</p>
 
 <p>You can configure fine-grained logging using the <code>RUST_LOG</code> environment variable. (&lt;https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html#directives&gt;)</p>

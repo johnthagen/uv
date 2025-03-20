@@ -555,6 +555,9 @@ pub struct MetadataVersionArgs {
     /// Don't actually perform any changes (but display what they would be)
     #[arg(long)]
     pub dry_run: bool,
+    /// Only print the final value
+    #[arg(long)]
+    pub short: bool,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, clap::ValueEnum)]
