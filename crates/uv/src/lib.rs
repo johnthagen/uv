@@ -23,7 +23,10 @@ use uv_cli::{
     compat::CompatArgs, BuildBackendCommand, CacheCommand, CacheNamespace, Cli, Commands,
     PipCommand, PipNamespace, ProjectCommand,
 };
-use uv_cli::{PythonCommand, PythonNamespace, ToolCommand, ToolNamespace, TopLevelArgs};
+use uv_cli::{
+    MetadataCommand, MetadataNamespace, MetadataVersionArgs, PythonCommand, PythonNamespace,
+    ToolCommand, ToolNamespace, TopLevelArgs,
+};
 #[cfg(feature = "self-update")]
 use uv_cli::{SelfCommand, SelfNamespace, SelfUpdateArgs};
 use uv_fs::{Simplified, CWD};
@@ -1023,6 +1026,14 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 is not available. Please use your package manager to update uv."
             );
         }
+        Commands::Metadata(MetadataNamespace {
+            command:
+                MetadataCommand::Version(MetadataVersionArgs {
+                    value,
+                    bump,
+                    dry_run,
+                }),
+        }) => commands::metadata_version(value, bump, dry_run, &workspace_cache, printer).await,
         Commands::Version { output_format } => {
             commands::version(output_format, &mut stdout())?;
             Ok(ExitStatus::Success)
