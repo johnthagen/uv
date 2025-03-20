@@ -65,6 +65,11 @@ pub(crate) fn create(
         interpreter.to_base_python()?
     };
 
+    dbg!(
+        "Using base executable for virtual environment: {:?}",
+        &base_python
+    );
+
     debug!(
         "Using base executable for virtual environment: {}",
         base_python.display()
@@ -143,6 +148,7 @@ pub(crate) fn create(
     // Create a `.gitignore` file to ignore all files in the venv.
     fs::write(location.join(".gitignore"), "*")?;
 
+    // FIXME: In unix use symlink
     // Per PEP 405, the Python `home` is the parent directory of the interpreter.
     let python_home = base_python.parent().ok_or_else(|| {
         io::Error::new(
@@ -155,9 +161,31 @@ pub(crate) fn create(
     fs::create_dir_all(&scripts)?;
     let executable = scripts.join(format!("python{EXE_SUFFIX}"));
 
+    // FIXME: In unix, replace base_python with symlink dir
     #[cfg(unix)]
     {
-        uv_fs::replace_symlink(&base_python, &executable)?;
+        dbg!("|||||||| base_python: {:?}", &base_python);
+        // FIXME: Doc
+        let executable_target = if interpreter.is_standalone() {
+            // FIXME: Check that there is a `bin` parent and a parent of that
+            base_python.parent().unwrap().parent().unwrap().parent().unwrap()
+                .join(format!(
+                    "python{}.{}",
+                    interpreter.python_major(),
+                    interpreter.python_minor(),
+                ))
+                .join("bin")
+                .join(format!(
+                "python{}.{}",
+                interpreter.python_major(),
+                interpreter.python_minor(),
+            ))
+        } else {
+            base_python.clone()
+        };
+        uv_fs::replace_symlink(&executable_target, &executable)?;
+        dbg!("created dir link {:?} <- {:?}", &executable_target, &executable);
+        // uv_fs::replace_symlink(&base_python, &executable)?;
         uv_fs::replace_symlink(
             "python",
             scripts.join(format!("python{}", interpreter.python_major())),

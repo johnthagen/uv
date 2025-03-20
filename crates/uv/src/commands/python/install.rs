@@ -215,12 +215,16 @@ pub(crate) async fn install(
                 unsatisfied.push(Cow::Borrowed(request));
             }
 
+            // dbg!("Request: {:?}", &request.request);
             for installation in matching_installations {
                 changelog.existing.insert(installation.key().clone());
+                // dbg!("Next Installation: {:?}", installation);
                 if matches!(&request.request, &PythonRequest::Any) {
+                    // dbg!("--We're in!");
                     // Construct a install request matching the existing installation
                     match InstallRequest::new(PythonRequest::Key(installation.into())) {
                         Ok(request) => {
+                            // dbg!("--We're really in!");
                             debug!("Will reinstall `{}`", installation.key().green());
                             unsatisfied.push(Cow::Owned(request));
                         }
@@ -234,6 +238,8 @@ pub(crate) async fn install(
                         }
                     }
                 } else {
+                    // dbg!("-- We're not in!");
+                    // FIXME !@: Address this if possible
                     // TODO(zanieb): This isn't really right! But we need `--upgrade` or similar
                     // to handle this case correctly without causing a breaking change.
 
@@ -248,7 +254,7 @@ pub(crate) async fn install(
                 }
             }
         }
-
+        // dbg!("-- unsatisfied: {:?}", &unsatisfied);
         (vec![], unsatisfied)
     } else {
         // If we can find one existing installation that matches the request, it is satisfied
@@ -303,6 +309,7 @@ pub(crate) async fn install(
     let reporter = PythonDownloadReporter::new(printer, downloads.len() as u64);
     let mut tasks = FuturesUnordered::new();
 
+    // dbg!("Downloads: {:?}", &downloads);
     for download in &downloads {
         tasks.push(async {
             (
@@ -334,6 +341,7 @@ pub(crate) async fn install(
                 };
 
                 let installation = ManagedPythonInstallation::new(path, download);
+                // dbg!("New downloaded installation: {:?}", &installation);
                 changelog.installed.insert(installation.key().clone());
                 if changelog.existing.contains(installation.key()) {
                     changelog.uninstalled.insert(installation.key().clone());
@@ -360,6 +368,7 @@ pub(crate) async fn install(
         installation.ensure_externally_managed()?;
         installation.ensure_sysconfig_patched()?;
         installation.ensure_canonical_executables()?;
+        installation.ensure_minor_version_link()?;
         if let Err(e) = installation.ensure_dylib_patched() {
             e.warn_user(installation);
         }
@@ -531,6 +540,11 @@ fn create_bin_links(
         let target = bin.join(target);
         match installation.create_bin_link(&target) {
             Ok(()) => {
+                dbg!(
+                    "Installed executable for `{:?}`",// at `{:?}` for {:?}",
+                    // target.simplified_display(),
+                    installation.key(),
+                );
                 debug!(
                     "Installed executable at `{}` for {}",
                     target.simplified_display(),
@@ -654,6 +668,7 @@ fn create_bin_links(
 
                 // Replace the existing link
                 fs_err::remove_file(&to)?;
+                dbg!("Removed link at {:?}", &to);
 
                 if let Some(existing) = existing {
                     // Ensure we do not report installation of this executable for an existing
@@ -666,6 +681,11 @@ fn create_bin_links(
                 }
 
                 installation.create_bin_link(&target)?;
+                dbg!(
+                    "Updated executable to `{:?}`",// at `{}` to {}",
+                    // target.simplified_display(),
+                    installation.key(),
+                );
                 debug!(
                     "Updated executable at `{}` to {}",
                     target.simplified_display(),
