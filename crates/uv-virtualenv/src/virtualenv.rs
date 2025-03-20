@@ -3,7 +3,7 @@
 use std::env::consts::EXE_SUFFIX;
 use std::io;
 use std::io::{BufWriter, Write};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use fs_err as fs;
 use fs_err::File;
@@ -64,11 +64,6 @@ pub(crate) fn create(
     } else {
         interpreter.to_base_python()?
     };
-
-    dbg!(
-        "Using base executable for virtual environment: {:?}",
-        &base_python
-    );
 
     debug!(
         "Using base executable for virtual environment: {}",
@@ -151,7 +146,8 @@ pub(crate) fn create(
     // FIXME: In unix use symlink
     // Per PEP 405, the Python `home` is the parent directory of the interpreter.
     // FIXME: Doc
-    let python_home = interpreter.to_base_python_or_symlink_path()?
+    let python_home = interpreter
+        .to_base_python_or_symlink_path()?
         .parent()
         .ok_or_else(|| {
             io::Error::new(
@@ -169,10 +165,11 @@ pub(crate) fn create(
     // FIXME: In unix, replace base_python with symlink dir
     #[cfg(unix)]
     {
-        dbg!("|||||||| base_python: {:?}", &base_python);
+        // dbg!("|||||||| base_python: {:?}", &base_python);
         // FIXME: Doc
         let executable_target = interpreter.to_base_python_or_symlink_path()?;
         uv_fs::replace_symlink(&executable_target, &executable)?;
+        dbg!("executable_target: {:?}", &executable_target);
         // uv_fs::replace_symlink(&base_python, &executable)?;
         uv_fs::replace_symlink(
             "python",

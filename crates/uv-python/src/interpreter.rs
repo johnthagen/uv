@@ -141,7 +141,11 @@ impl Interpreter {
         let base_python = self.to_base_python()?;
         if cfg!(unix) && self.is_standalone() {
             if let Some(bin) = base_python.parent() {
-                if bin.components().last().is_some_and(|c| c.as_os_str() == "bin") {
+                if bin
+                    .components()
+                    .last()
+                    .is_some_and(|c| c.as_os_str() == "bin")
+                {
                     if let Some(path) = bin.parent().and_then(Path::parent) {
                         let path_link = path
                             .to_path_buf()
@@ -156,8 +160,10 @@ impl Interpreter {
                                 self.python_major(),
                                 self.python_minor()
                             ));
-                        debug!("Using directory symlink instead of base Python: {}",
-                            &path_link.display());
+                        debug!(
+                            "Using directory symlink instead of base Python: {}",
+                            &path_link.display()
+                        );
                         return Ok(path_link);
                     }
                 }

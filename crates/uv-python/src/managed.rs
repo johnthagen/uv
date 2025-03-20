@@ -509,7 +509,7 @@ impl ManagedPythonInstallation {
             let link_name = format!("python{}.{}", self.key.major, self.key.minor);
             let link_dir = self.path().with_file_name(link_name);
 
-            match replace_symlink(&self.path(), &link_dir) {
+            match replace_symlink(self.path(), &link_dir) {
                 Ok(()) => {
                     dbg!("Created minor sym link {:?} <- {:?}", &python, &link_dir);
                     debug!(
@@ -604,12 +604,12 @@ impl ManagedPythonInstallation {
     ///
     /// If the file already exists at the target path, an error will be returned.
     pub fn create_bin_link(&self, target: &Path) -> Result<(), Error> {
-        dbg!("bin_link target path: {:?}", &target);
+        // dbg!("bin_link target path: {:?}", &target);
         let python = self.executable(false);
-        dbg!("python executable path: {:?}", &python);
+        // dbg!("python executable path: {:?}", &python);
 
         let bin = target.parent().ok_or(Error::NoExecutableDirectory)?;
-        dbg!("bin path: {:?}", &bin);
+        // dbg!("bin path: {:?}", &bin);
         fs_err::create_dir_all(bin).map_err(|err| Error::ExecutableDirectory {
             to: bin.to_path_buf(),
             err,
@@ -617,11 +617,11 @@ impl ManagedPythonInstallation {
 
         if cfg!(unix) {
             // Note this will never copy on Unix — we use it here to allow compilation on Windows
-            dbg!(
-                "[creaet_bin_link...] symlink_or_copy_file: {:?} <- {:?}",
-                &python,
-                &target
-            );
+            // dbg!(
+            //     "[creaet_bin_link...] symlink_or_copy_file: {:?} <- {:?}",
+            //     &python,
+            //     &target
+            // );
             match symlink_or_copy_file(&python, target) {
                 Ok(()) => Ok(()),
                 Err(err) if err.kind() == io::ErrorKind::NotFound => {
