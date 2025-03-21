@@ -9703,7 +9703,9 @@ uv metadata version [OPTIONS] [VALUE]
 
 <p>See <code>--project</code> to only change the project root directory.</p>
 
-</dd><dt id="uv-metadata-version--dry-run"><a href="#uv-metadata-version--dry-run"><code>--dry-run</code></a></dt><dd><p>Don&#8217;t actually perform any changes (but display what they would be)</p>
+</dd><dt id="uv-metadata-version--dry-run"><a href="#uv-metadata-version--dry-run"><code>--dry-run</code></a></dt><dd><p>Don&#8217;t write a new version to the <code>pyproject.toml</code></p>
+
+<p>Instead, the version will be displayed.</p>
 
 </dd><dt id="uv-metadata-version--help"><a href="#uv-metadata-version--help"><code>--help</code></a>, <code>-h</code></dt><dd><p>Display the concise help for this command</p>
 
