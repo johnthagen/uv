@@ -552,7 +552,9 @@ pub struct MetadataVersionArgs {
     /// Update the project version using the given semantics
     #[arg(group = "operation", long)]
     pub bump: Option<VersionBump>,
-    /// Don't actually perform any changes (but display what they would be)
+    /// Don't write a new version to the `pyproject.toml`
+    ///
+    /// Instead, the version will be displayed.
     #[arg(long)]
     pub dry_run: bool,
     /// Only print the final value
