@@ -507,8 +507,8 @@ impl ManagedPythonInstallation {
         if cfg!(unix) {
             let python = self.executable(false);
             let version_name = format!("python{}.{}", self.key.major, self.key.minor);
-            let link_dir = self.path().with_file_name(&version_name);
-            let python_link = link_dir.join("bin").with_file_name(&version_name);
+            let python_link = self.path().with_file_name(&version_name);
+            let link_dir = self.path().with_file_name(format!("{}-dir", &version_name));
 
             match replace_symlink(self.path(), &link_dir) {
                 Ok(()) => {

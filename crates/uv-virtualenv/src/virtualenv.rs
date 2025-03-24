@@ -167,9 +167,10 @@ pub(crate) fn create(
     {
         // dbg!("|||||||| base_python: {:?}", &base_python);
         // FIXME: Doc
-        let executable_target = interpreter.to_base_python_or_symlink_path()?;
+        let executable_target = interpreter.to_base_python_or_symlink()?;
         uv_fs::replace_symlink(&executable_target, &executable)?;
         dbg!("executable_target: {:?}", &executable_target);
+        dbg!("executable: {:?}", &executable);
         // uv_fs::replace_symlink(&base_python, &executable)?;
         uv_fs::replace_symlink(
             "python",
