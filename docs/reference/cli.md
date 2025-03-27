@@ -9614,5 +9614,7 @@ uv help [OPTIONS] [COMMAND]...
 
 <p>You can configure fine-grained logging using the <code>RUST_LOG</code> environment variable. (&lt;https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html#directives&gt;)</p>
 
+</dd><dt id="uv-help--version"><a href="#uv-help--version"><code>--version</code></a>, <code>-V</code></dt><dd><p>Print version</p>
+
 </dd></dl>
 

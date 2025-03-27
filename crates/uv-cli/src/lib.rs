@@ -512,6 +512,7 @@ pub enum Commands {
             option = Style::new().bold(),
         ),
     )]
+    #[command(version = crate::version::version())]
     Help(HelpArgs),
 }
 
