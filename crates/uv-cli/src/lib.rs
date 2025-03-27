@@ -3985,6 +3985,7 @@ pub enum ToolCommand {
         after_help = "Use `uv help tool run` for more details.",
         after_long_help = ""
     )]
+    #[command(version)]
     Uvx(ToolRunArgs),
     /// Install commands provided by a Python package.
     ///
