@@ -158,28 +158,259 @@ fn run_args() -> Result<()> {
     })?;
 
     // We treat arguments before the command as uv arguments
-    uv_snapshot!(context.filters(), context.run().arg("--version").arg("python"), @r###"
+    uv_snapshot!(context.filters(), context.run().arg("--help").arg("python"), @r#"
     success: true
     exit_code: 0
     ----- stdout -----
-    uv [VERSION] ([COMMIT] DATE)
+    Run a command or script
+
+    Usage: uv run [OPTIONS] [COMMAND]
+
+    Options:
+          --extra <EXTRA>
+              Include optional dependencies from the specified extra name
+          --all-extras
+              Include all optional dependencies
+          --no-extra <NO_EXTRA>
+              Exclude the specified optional dependencies, if `--all-extras` is supplied
+          --no-dev
+              Disable the development dependency group
+          --group <GROUP>
+              Include dependencies from the specified dependency group
+          --no-group <NO_GROUP>
+              Disable the specified dependency group
+          --no-default-groups
+              Ignore the default dependency groups
+          --only-group <ONLY_GROUP>
+              Only include dependencies from the specified dependency group
+          --all-groups
+              Include dependencies from all dependency groups
+      -m, --module
+              Run a Python module
+          --only-dev
+              Only include the development dependency group
+          --no-editable
+              Install any editable dependencies, including the project and any workspace members, as
+              non-editable
+          --exact
+              Perform an exact sync, removing extraneous packages
+          --env-file <ENV_FILE>
+              Load environment variables from a `.env` file [env: UV_ENV_FILE=]
+          --no-env-file
+              Avoid reading environment variables from a `.env` file [env: UV_NO_ENV_FILE=]
+          --with <WITH>
+              Run with the given packages installed
+          --with-editable <WITH_EDITABLE>
+              Run with the given packages installed in editable mode
+          --with-requirements <WITH_REQUIREMENTS>
+              Run with all packages listed in the given `requirements.txt` files
+          --isolated
+              Run the command in an isolated virtual environment
+          --active
+              Prefer the active virtual environment over the project's virtual environment
+          --no-sync
+              Avoid syncing the virtual environment [env: UV_NO_SYNC=]
+          --locked
+              Assert that the `uv.lock` will remain unchanged [env: UV_LOCKED=]
+          --frozen
+              Run without updating the `uv.lock` file [env: UV_FROZEN=]
+      -s, --script
+              Run the given path as a Python script
+          --gui-script
+              Run the given path as a Python GUI script
+          --all-packages
+              Run the command with all workspace members installed
+          --package <PACKAGE>
+              Run the command in a specific package in the workspace
+          --no-project
+              Avoid discovering the project or workspace
+
+    Index options:
+          --index <INDEX>
+              The URLs to use when resolving dependencies, in addition to the default index [env:
+              UV_INDEX=]
+          --default-index <DEFAULT_INDEX>
+              The URL of the default package index (by default: <https://pypi.org/simple>) [env:
+              UV_DEFAULT_INDEX=]
+      -i, --index-url <INDEX_URL>
+              (Deprecated: use `--default-index` instead) The URL of the Python package index (by
+              default: <https://pypi.org/simple>) [env: UV_INDEX_URL=]
+          --extra-index-url <EXTRA_INDEX_URL>
+              (Deprecated: use `--index` instead) Extra URLs of package indexes to use, in addition to
+              `--index-url` [env: UV_EXTRA_INDEX_URL=]
+      -f, --find-links <FIND_LINKS>
+              Locations to search for candidate distributions, in addition to those found in the
+              registry indexes [env: UV_FIND_LINKS=]
+          --no-index
+              Ignore the registry index (e.g., PyPI), instead relying on direct URL dependencies and
+              those provided via `--find-links`
+          --index-strategy <INDEX_STRATEGY>
+              The strategy to use when resolving against multiple index URLs [env: UV_INDEX_STRATEGY=]
+              [possible values: first-index, unsafe-first-match, unsafe-best-match]
+          --keyring-provider <KEYRING_PROVIDER>
+              Attempt to use `keyring` for authentication for index URLs [env: UV_KEYRING_PROVIDER=]
+              [possible values: disabled, subprocess]
+
+    Resolver options:
+      -U, --upgrade
+              Allow package upgrades, ignoring pinned versions in any existing output file. Implies
+              `--refresh`
+      -P, --upgrade-package <UPGRADE_PACKAGE>
+              Allow upgrades for a specific package, ignoring pinned versions in any existing output
+              file. Implies `--refresh-package`
+          --resolution <RESOLUTION>
+              The strategy to use when selecting between the different compatible versions for a given
+              package requirement [env: UV_RESOLUTION=] [possible values: highest, lowest,
+              lowest-direct]
+          --prerelease <PRERELEASE>
+              The strategy to use when considering pre-release versions [env: UV_PRERELEASE=] [possible
+              values: disallow, allow, if-necessary, explicit, if-necessary-or-explicit]
+          --fork-strategy <FORK_STRATEGY>
+              The strategy to use when selecting multiple versions of a given package across Python
+              versions and platforms [env: UV_FORK_STRATEGY=] [possible values: fewest, requires-python]
+          --exclude-newer <EXCLUDE_NEWER>
+              Limit candidate packages to those that were uploaded prior to the given date [env:
+              UV_EXCLUDE_NEWER=2024-03-25T00:00:00Z]
+          --no-sources
+              Ignore the `tool.uv.sources` table when resolving dependencies. Used to lock against the
+              standards-compliant, publishable package metadata, as opposed to using any workspace, Git,
+              URL, or local path sources
+
+    Installer options:
+          --reinstall
+              Reinstall all packages, regardless of whether they're already installed. Implies
+              `--refresh`
+          --reinstall-package <REINSTALL_PACKAGE>
+              Reinstall a specific package, regardless of whether it's already installed. Implies
+              `--refresh-package`
+          --link-mode <LINK_MODE>
+              The method to use when installing packages from the global cache [env: UV_LINK_MODE=]
+              [possible values: clone, copy, hardlink, symlink]
+          --compile-bytecode
+              Compile Python files to bytecode after installation [env: UV_COMPILE_BYTECODE=]
+
+    Build options:
+      -C, --config-setting <CONFIG_SETTING>
+              Settings to pass to the PEP 517 build backend, specified as `KEY=VALUE` pairs
+          --no-build-isolation
+              Disable isolation when building source distributions [env: UV_NO_BUILD_ISOLATION=]
+          --no-build-isolation-package <NO_BUILD_ISOLATION_PACKAGE>
+              Disable isolation when building source distributions for a specific package
+          --no-build
+              Don't build source distributions [env: UV_NO_BUILD=]
+          --no-build-package <NO_BUILD_PACKAGE>
+              Don't build source distributions for a specific package [env: UV_NO_BUILD_PACKAGE=]
+          --no-binary
+              Don't install pre-built wheels [env: UV_NO_BINARY=]
+          --no-binary-package <NO_BINARY_PACKAGE>
+              Don't install pre-built wheels for a specific package [env: UV_NO_BINARY_PACKAGE=]
+
+    Cache options:
+      -n, --no-cache
+              Avoid reading from or writing to the cache, instead using a temporary directory for the
+              duration of the operation [env: UV_NO_CACHE=]
+          --cache-dir [CACHE_DIR]
+              Path to the cache directory [env: UV_CACHE_DIR=]
+          --refresh
+              Refresh all cached data
+          --refresh-package <REFRESH_PACKAGE>
+              Refresh cached data for a specific package
+
+    Python options:
+      -p, --python <PYTHON>      The Python interpreter to use for the run environment. [env:
+                                 UV_PYTHON=]
+          --managed-python       Require use of uv-managed Python versions [env: UV_MANAGED_PYTHON=]
+          --no-managed-python    Disable use of uv-managed Python versions [env: UV_NO_MANAGED_PYTHON=]
+          --no-python-downloads  Disable automatic downloads of Python. [env:
+                                 "UV_PYTHON_DOWNLOADS=never"]
+
+    Global options:
+      -q, --quiet...
+              Use quiet output
+      -v, --verbose...
+              Use verbose output
+          --color <COLOR_CHOICE>
+              Control the use of color in output [possible values: auto, always, never]
+          --native-tls
+              Whether to load TLS certificates from the platform's native certificate store [env:
+              UV_NATIVE_TLS=]
+          --offline
+              Disable network access [env: UV_OFFLINE=]
+          --allow-insecure-host <ALLOW_INSECURE_HOST>
+              Allow insecure connections to a host [env: UV_INSECURE_HOST=]
+          --no-progress
+              Hide all progress outputs [env: UV_NO_PROGRESS=]
+          --directory <DIRECTORY>
+              Change to the given directory prior to running the command
+          --project <PROJECT>
+              Run the command within the given project directory
+          --config-file <CONFIG_FILE>
+              The path to a `uv.toml` file to use for configuration [env: UV_CONFIG_FILE=]
+          --no-config
+              Avoid discovering configuration files (`pyproject.toml`, `uv.toml`) [env: UV_NO_CONFIG=]
+      -h, --help
+              Display the concise help for this command
+
+    Use `uv help run` for more details.
 
     ----- stderr -----
-    "###);
+    "#);
 
     // We don't treat arguments after the command as uv arguments
-    uv_snapshot!(context.filters(), context.run().arg("python").arg("--version"), @r###"
+    uv_snapshot!(context.filters(), context.run().arg("python").arg("--help"), @r"
     success: true
     exit_code: 0
     ----- stdout -----
-    Python 3.12.[X]
+    usage: [VENV]/bin/python3 [option] ... [-c cmd | -m mod | file | -] [arg] ...
+    Options (and corresponding environment variables):
+    -b     : issue warnings about converting bytes/bytearray to str and comparing
+             bytes/bytearray with str or bytes with int. (-bb: issue errors)
+    -B     : don't write .pyc files on import; also PYTHONDONTWRITEBYTECODE=x
+    -c cmd : program passed in as string (terminates option list)
+    -d     : turn on parser debugging output (for experts only, only works on
+             debug builds); also PYTHONDEBUG=x
+    -E     : ignore PYTHON* environment variables (such as PYTHONPATH)
+    -h     : print this help message and exit (also -? or --help)
+    -i     : inspect interactively after running script; forces a prompt even
+             if stdin does not appear to be a terminal; also PYTHONINSPECT=x
+    -I     : isolate Python from the user's environment (implies -E and -s)
+    -m mod : run library module as a script (terminates option list)
+    -O     : remove assert and __debug__-dependent statements; add .opt-1 before
+             .pyc extension; also PYTHONOPTIMIZE=x
+    -OO    : do -O changes and also discard docstrings; add .opt-2 before
+             .pyc extension
+    -P     : don't prepend a potentially unsafe path to sys.path; also
+             PYTHONSAFEPATH
+    -q     : don't print version and copyright messages on interactive startup
+    -s     : don't add user site directory to sys.path; also PYTHONNOUSERSITE=x
+    -S     : don't imply 'import site' on initialization
+    -u     : force the stdout and stderr streams to be unbuffered;
+             this option has no effect on stdin; also PYTHONUNBUFFERED=x
+    -v     : verbose (trace import statements); also PYTHONVERBOSE=x
+             can be supplied multiple times to increase verbosity
+    -V     : print the Python version number and exit (also --version)
+             when given twice, print more information about the build
+    -W arg : warning control; arg is action:message:category:module:lineno
+             also PYTHONWARNINGS=arg
+    -x     : skip first line of source, allowing use of non-Unix forms of #!cmd
+    -X opt : set implementation-specific option
+    --check-hash-based-pycs always|default|never:
+             control how Python invalidates hash-based .pyc files
+    --help-env: print help about Python environment variables and exit
+    --help-xoptions: print help about implementation-specific -X options and exit
+    --help-all: print complete help information and exit
+
+    Arguments:
+    file   : program read from script file
+    -      : program read from stdin (default; interactive mode if a tty)
+    arg ...: arguments passed to program in sys.argv[1:]
 
     ----- stderr -----
     Resolved 1 package in [TIME]
     Prepared 1 package in [TIME]
     Installed 1 package in [TIME]
      + foo==1.0.0 (from file://[TEMP_DIR]/)
-    "###);
+    ");
 
     // Can use `--` to separate uv arguments from the command arguments.
     uv_snapshot!(context.filters(), context.run().arg("--").arg("python").arg("--version"), @r###"

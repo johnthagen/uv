@@ -13,28 +13,454 @@ fn tool_run_args() {
 
     // We treat arguments before the command as uv arguments
     uv_snapshot!(context.filters(), context.tool_run()
-        .arg("--version")
+        .arg("--help")
         .arg("pytest")
         .env(EnvVars::UV_TOOL_DIR, tool_dir.as_os_str())
-        .env(EnvVars::XDG_BIN_HOME, bin_dir.as_os_str()), @r###"
+        .env(EnvVars::XDG_BIN_HOME, bin_dir.as_os_str()), @r#"
     success: true
     exit_code: 0
     ----- stdout -----
-    uv [VERSION] ([COMMIT] DATE)
+    Run a command provided by a Python package
+
+    Usage: uv tool run [OPTIONS] [COMMAND]
+
+    Options:
+          --from <FROM>
+              Use the given package to provide the command
+          --with <WITH>
+              Run with the given packages installed
+          --with-editable <WITH_EDITABLE>
+              Run with the given packages installed in editable mode
+          --with-requirements <WITH_REQUIREMENTS>
+              Run with all packages listed in the given `requirements.txt` files
+      -c, --constraints <CONSTRAINTS>
+              Constrain versions using the given requirements files [env: UV_CONSTRAINT=]
+          --overrides <OVERRIDES>
+              Override versions using the given requirements files [env: UV_OVERRIDE=]
+          --isolated
+              Run the tool in an isolated virtual environment, ignoring any already-installed tools
+          --env-file <ENV_FILE>
+              Load environment variables from a `.env` file [env: UV_ENV_FILE=]
+          --no-env-file
+              Avoid reading environment variables from a `.env` file [env: UV_NO_ENV_FILE=]
+
+    Index options:
+          --index <INDEX>
+              The URLs to use when resolving dependencies, in addition to the default index [env:
+              UV_INDEX=]
+          --default-index <DEFAULT_INDEX>
+              The URL of the default package index (by default: <https://pypi.org/simple>) [env:
+              UV_DEFAULT_INDEX=]
+      -i, --index-url <INDEX_URL>
+              (Deprecated: use `--default-index` instead) The URL of the Python package index (by
+              default: <https://pypi.org/simple>) [env: UV_INDEX_URL=]
+          --extra-index-url <EXTRA_INDEX_URL>
+              (Deprecated: use `--index` instead) Extra URLs of package indexes to use, in addition to
+              `--index-url` [env: UV_EXTRA_INDEX_URL=]
+      -f, --find-links <FIND_LINKS>
+              Locations to search for candidate distributions, in addition to those found in the
+              registry indexes [env: UV_FIND_LINKS=]
+          --no-index
+              Ignore the registry index (e.g., PyPI), instead relying on direct URL dependencies and
+              those provided via `--find-links`
+          --index-strategy <INDEX_STRATEGY>
+              The strategy to use when resolving against multiple index URLs [env: UV_INDEX_STRATEGY=]
+              [possible values: first-index, unsafe-first-match, unsafe-best-match]
+          --keyring-provider <KEYRING_PROVIDER>
+              Attempt to use `keyring` for authentication for index URLs [env: UV_KEYRING_PROVIDER=]
+              [possible values: disabled, subprocess]
+
+    Resolver options:
+      -U, --upgrade
+              Allow package upgrades, ignoring pinned versions in any existing output file. Implies
+              `--refresh`
+      -P, --upgrade-package <UPGRADE_PACKAGE>
+              Allow upgrades for a specific package, ignoring pinned versions in any existing output
+              file. Implies `--refresh-package`
+          --resolution <RESOLUTION>
+              The strategy to use when selecting between the different compatible versions for a given
+              package requirement [env: UV_RESOLUTION=] [possible values: highest, lowest,
+              lowest-direct]
+          --prerelease <PRERELEASE>
+              The strategy to use when considering pre-release versions [env: UV_PRERELEASE=] [possible
+              values: disallow, allow, if-necessary, explicit, if-necessary-or-explicit]
+          --fork-strategy <FORK_STRATEGY>
+              The strategy to use when selecting multiple versions of a given package across Python
+              versions and platforms [env: UV_FORK_STRATEGY=] [possible values: fewest, requires-python]
+          --exclude-newer <EXCLUDE_NEWER>
+              Limit candidate packages to those that were uploaded prior to the given date [env:
+              UV_EXCLUDE_NEWER=2024-03-25T00:00:00Z]
+          --no-sources
+              Ignore the `tool.uv.sources` table when resolving dependencies. Used to lock against the
+              standards-compliant, publishable package metadata, as opposed to using any workspace, Git,
+              URL, or local path sources
+
+    Installer options:
+          --reinstall
+              Reinstall all packages, regardless of whether they're already installed. Implies
+              `--refresh`
+          --reinstall-package <REINSTALL_PACKAGE>
+              Reinstall a specific package, regardless of whether it's already installed. Implies
+              `--refresh-package`
+          --link-mode <LINK_MODE>
+              The method to use when installing packages from the global cache [env: UV_LINK_MODE=]
+              [possible values: clone, copy, hardlink, symlink]
+          --compile-bytecode
+              Compile Python files to bytecode after installation [env: UV_COMPILE_BYTECODE=]
+
+    Build options:
+      -C, --config-setting <CONFIG_SETTING>
+              Settings to pass to the PEP 517 build backend, specified as `KEY=VALUE` pairs
+          --no-build-isolation
+              Disable isolation when building source distributions [env: UV_NO_BUILD_ISOLATION=]
+          --no-build-isolation-package <NO_BUILD_ISOLATION_PACKAGE>
+              Disable isolation when building source distributions for a specific package
+          --no-build
+              Don't build source distributions [env: UV_NO_BUILD=]
+          --no-build-package <NO_BUILD_PACKAGE>
+              Don't build source distributions for a specific package [env: UV_NO_BUILD_PACKAGE=]
+          --no-binary
+              Don't install pre-built wheels [env: UV_NO_BINARY=]
+          --no-binary-package <NO_BINARY_PACKAGE>
+              Don't install pre-built wheels for a specific package [env: UV_NO_BINARY_PACKAGE=]
+
+    Cache options:
+      -n, --no-cache
+              Avoid reading from or writing to the cache, instead using a temporary directory for the
+              duration of the operation [env: UV_NO_CACHE=]
+          --cache-dir [CACHE_DIR]
+              Path to the cache directory [env: UV_CACHE_DIR=]
+          --refresh
+              Refresh all cached data
+          --refresh-package <REFRESH_PACKAGE>
+              Refresh cached data for a specific package
+
+    Python options:
+      -p, --python <PYTHON>      The Python interpreter to use to build the run environment. [env:
+                                 UV_PYTHON=]
+          --managed-python       Require use of uv-managed Python versions [env: UV_MANAGED_PYTHON=]
+          --no-managed-python    Disable use of uv-managed Python versions [env: UV_NO_MANAGED_PYTHON=]
+          --no-python-downloads  Disable automatic downloads of Python. [env:
+                                 "UV_PYTHON_DOWNLOADS=never"]
+
+    Global options:
+      -q, --quiet...
+              Use quiet output
+      -v, --verbose...
+              Use verbose output
+          --color <COLOR_CHOICE>
+              Control the use of color in output [possible values: auto, always, never]
+          --native-tls
+              Whether to load TLS certificates from the platform's native certificate store [env:
+              UV_NATIVE_TLS=]
+          --offline
+              Disable network access [env: UV_OFFLINE=]
+          --allow-insecure-host <ALLOW_INSECURE_HOST>
+              Allow insecure connections to a host [env: UV_INSECURE_HOST=]
+          --no-progress
+              Hide all progress outputs [env: UV_NO_PROGRESS=]
+          --directory <DIRECTORY>
+              Change to the given directory prior to running the command
+          --project <PROJECT>
+              Run the command within the given project directory
+          --config-file <CONFIG_FILE>
+              The path to a `uv.toml` file to use for configuration [env: UV_CONFIG_FILE=]
+          --no-config
+              Avoid discovering configuration files (`pyproject.toml`, `uv.toml`) [env: UV_NO_CONFIG=]
+      -h, --help
+              Display the concise help for this command
+
+    Use `uvx` as a shortcut for `uv tool run`.
+
+    Use `uv help tool run` for more details.
 
     ----- stderr -----
-    "###);
+    "#);
 
     // We don't treat arguments after the command as uv arguments
     uv_snapshot!(context.filters(), context.tool_run()
         .arg("pytest")
-        .arg("--version")
+        .arg("--help")
         .env(EnvVars::UV_TOOL_DIR, tool_dir.as_os_str())
-        .env(EnvVars::XDG_BIN_HOME, bin_dir.as_os_str()), @r###"
+        .env(EnvVars::XDG_BIN_HOME, bin_dir.as_os_str()), @r#"
     success: true
     exit_code: 0
     ----- stdout -----
-    pytest 8.1.1
+    usage: pytest [options] [file_or_dir] [file_or_dir] [...]
+
+    positional arguments:
+      file_or_dir
+
+    general:
+      -k EXPRESSION         Only run tests which match the given substring expression. An expression is
+                            a Python evaluatable expression where all names are substring-matched
+                            against test names and their parent classes. Example: -k 'test_method or
+                            test_other' matches all test functions and classes whose name contains
+                            'test_method' or 'test_other', while -k 'not test_method' matches those that
+                            don't contain 'test_method' in their names. -k 'not test_method and not
+                            test_other' will eliminate the matches. Additionally keywords are matched to
+                            classes and functions containing extra names in their
+                            'extra_keyword_matches' set, as well as functions which have names assigned
+                            directly to them. The matching is case-insensitive.
+      -m MARKEXPR           Only run tests matching given mark expression. For example: -m 'mark1 and
+                            not mark2'.
+      --markers             show markers (builtin, plugin and per-project ones).
+      -x, --exitfirst       Exit instantly on first error or failed test
+      --fixtures, --funcargs
+                            Show available fixtures, sorted by plugin appearance (fixtures with leading
+                            '_' are only shown with '-v')
+      --fixtures-per-test   Show fixtures per test
+      --pdb                 Start the interactive Python debugger on errors or KeyboardInterrupt
+      --pdbcls=modulename:classname
+                            Specify a custom interactive Python debugger for use with --pdb.For example:
+                            --pdbcls=IPython.terminal.debugger:TerminalPdb
+      --trace               Immediately break when running each test
+      --capture=method      Per-test capturing method: one of fd|sys|no|tee-sys
+      -s                    Shortcut for --capture=no
+      --runxfail            Report the results of xfail tests as if they were not marked
+      --lf, --last-failed   Rerun only the tests that failed at the last run (or all if none failed)
+      --ff, --failed-first  Run all tests, but run the last failures first. This may re-order tests and
+                            thus lead to repeated fixture setup/teardown.
+      --nf, --new-first     Run tests from new files first, then the rest of the tests sorted by file
+                            mtime
+      --cache-show=[CACHESHOW]
+                            Show cache contents, don't perform collection or tests. Optional argument:
+                            glob (default: '*').
+      --cache-clear         Remove all cache contents at start of test run
+      --lfnf={all,none}, --last-failed-no-failures={all,none}
+                            With ``--lf``, determines whether to execute tests when there are no
+                            previously (known) failures or when no cached ``lastfailed`` data was found.
+                            ``all`` (the default) runs the full test suite again. ``none`` just emits a
+                            message about no known failures and exits successfully.
+      --sw, --stepwise      Exit on test failure and continue from last failing test next time
+      --sw-skip, --stepwise-skip
+                            Ignore the first failing test but stop on the next failing test. Implicitly
+                            enables --stepwise.
+
+    Reporting:
+      --durations=N         Show N slowest setup/test durations (N=0 for all)
+      --durations-min=N     Minimal duration in seconds for inclusion in slowest list. Default: 0.005.
+      -v, --verbose         Increase verbosity
+      --no-header           Disable header
+      --no-summary          Disable summary
+      -q, --quiet           Decrease verbosity
+      --verbosity=VERBOSE   Set verbosity. Default: 0.
+      -r chars              Show extra test summary info as specified by chars: (f)ailed, (E)rror,
+                            (s)kipped, (x)failed, (X)passed, (p)assed, (P)assed with output, (a)ll
+                            except passed (p/P), or (A)ll. (w)arnings are enabled by default (see
+                            --disable-warnings), 'N' can be used to reset the list. (default: 'fE').
+      --disable-warnings, --disable-pytest-warnings
+                            Disable warnings summary
+      -l, --showlocals      Show locals in tracebacks (disabled by default)
+      --no-showlocals       Hide locals in tracebacks (negate --showlocals passed through addopts)
+      --tb=style            Traceback print mode (auto/long/short/line/native/no)
+      --show-capture={no,stdout,stderr,log,all}
+                            Controls how captured stdout/stderr/log is shown on failed tests. Default:
+                            all.
+      --full-trace          Don't cut any tracebacks (default is to cut)
+      --color=color         Color terminal output (yes/no/auto)
+      --code-highlight={yes,no}
+                            Whether code should be highlighted (only if --color is also enabled).
+                            Default: yes.
+      --pastebin=mode       Send failed|all info to bpaste.net pastebin service
+      --junit-xml=path      Create junit-xml style report file at given path
+      --junit-prefix=str    Prepend prefix to classnames in junit-xml output
+
+    pytest-warnings:
+      -W PYTHONWARNINGS, --pythonwarnings=PYTHONWARNINGS
+                            Set which warnings to report, see -W option of Python itself
+      --maxfail=num         Exit after first num failures or errors
+      --strict-config       Any warnings encountered while parsing the `pytest` section of the
+                            configuration file raise errors
+      --strict-markers      Markers not registered in the `markers` section of the configuration file
+                            raise errors
+      --strict              (Deprecated) alias to --strict-markers
+      -c FILE, --config-file=FILE
+                            Load configuration from `FILE` instead of trying to locate one of the
+                            implicit configuration files.
+      --continue-on-collection-errors
+                            Force test execution even if collection errors occur
+      --rootdir=ROOTDIR     Define root directory for tests. Can be relative path: 'root_dir',
+                            './root_dir', 'root_dir/another_dir/'; absolute path: '/home/user/root_dir';
+                            path with variables: '$HOME/root_dir'.
+
+    collection:
+      --collect-only, --co  Only collect tests, don't execute them
+      --pyargs              Try to interpret all arguments as Python packages
+      --ignore=path         Ignore path during collection (multi-allowed)
+      --ignore-glob=path    Ignore path pattern during collection (multi-allowed)
+      --deselect=nodeid_prefix
+                            Deselect item (via node id prefix) during collection (multi-allowed)
+      --confcutdir=dir      Only load conftest.py's relative to specified dir
+      --noconftest          Don't load any conftest.py files
+      --keep-duplicates     Keep duplicate tests
+      --collect-in-virtualenv
+                            Don't ignore tests in a local virtualenv directory
+      --import-mode={prepend,append,importlib}
+                            Prepend/append to sys.path when importing test modules and conftest files.
+                            Default: prepend.
+      --doctest-modules     Run doctests in all .py modules
+      --doctest-report={none,cdiff,ndiff,udiff,only_first_failure}
+                            Choose another output format for diffs on doctest failure
+      --doctest-glob=pat    Doctests file matching pattern, default: test*.txt
+      --doctest-ignore-import-errors
+                            Ignore doctest collection errors
+      --doctest-continue-on-failure
+                            For a given doctest, continue to run after the first failure
+
+    test session debugging and configuration:
+      --basetemp=dir        Base temporary directory for this test run. (Warning: this directory is
+                            removed if it exists.)
+      -V, --version         Display pytest version and information about plugins. When given twice, also
+                            display information about plugins.
+      -h, --help            Show help message and configuration info
+      -p name               Early-load given plugin module name or entry point (multi-allowed). To avoid
+                            loading of plugins, use the `no:` prefix, e.g. `no:doctest`.
+      --trace-config        Trace considerations of conftest.py files
+      --debug=[DEBUG_FILE_NAME]
+                            Store internal tracing debug information in this log file. This file is
+                            opened with 'w' and truncated as a result, care advised. Default:
+                            pytestdebug.log.
+      -o OVERRIDE_INI, --override-ini=OVERRIDE_INI
+                            Override ini option with "option=value" style, e.g. `-o xfail_strict=True -o
+                            cache_dir=cache`.
+      --assert=MODE         Control assertion debugging tools.
+                            'plain' performs no assertion debugging.
+                            'rewrite' (the default) rewrites assert statements in test modules on import
+                            to provide assert expression information.
+      --setup-only          Only setup fixtures, do not execute tests
+      --setup-show          Show setup of fixtures while executing tests
+      --setup-plan          Show what fixtures and tests would be executed but don't execute anything
+
+    logging:
+      --log-level=LEVEL     Level of messages to catch/display. Not set by default, so it depends on the
+                            root/parent log handler's effective level, where it is "WARNING" by default.
+      --log-format=LOG_FORMAT
+                            Log format used by the logging module
+      --log-date-format=LOG_DATE_FORMAT
+                            Log date format used by the logging module
+      --log-cli-level=LOG_CLI_LEVEL
+                            CLI logging level
+      --log-cli-format=LOG_CLI_FORMAT
+                            Log format used by the logging module
+      --log-cli-date-format=LOG_CLI_DATE_FORMAT
+                            Log date format used by the logging module
+      --log-file=LOG_FILE   Path to a file when logging will be written to
+      --log-file-mode={w,a}
+                            Log file open mode
+      --log-file-level=LOG_FILE_LEVEL
+                            Log file logging level
+      --log-file-format=LOG_FILE_FORMAT
+                            Log format used by the logging module
+      --log-file-date-format=LOG_FILE_DATE_FORMAT
+                            Log date format used by the logging module
+      --log-auto-indent=LOG_AUTO_INDENT
+                            Auto-indent multiline messages passed to the logging module. Accepts
+                            true|on, false|off or an integer.
+      --log-disable=LOGGER_DISABLE
+                            Disable a logger by name. Can be passed multiple times.
+
+    [pytest] ini-options in the first pytest.ini|tox.ini|setup.cfg|pyproject.toml file found:
+
+      markers (linelist):   Register new markers for test functions
+      empty_parameter_set_mark (string):
+                            Default marker for empty parametersets
+      norecursedirs (args): Directory patterns to avoid for recursion
+      testpaths (args):     Directories to search for tests when no files or directories are given on
+                            the command line
+      filterwarnings (linelist):
+                            Each line specifies a pattern for warnings.filterwarnings. Processed after
+                            -W/--pythonwarnings.
+      consider_namespace_packages (bool):
+                            Consider namespace packages when resolving module names during import
+      usefixtures (args):   List of default fixtures to be used with this project
+      python_files (args):  Glob-style file patterns for Python test module discovery
+      python_classes (args):
+                            Prefixes or glob names for Python test class discovery
+      python_functions (args):
+                            Prefixes or glob names for Python test function and method discovery
+      disable_test_id_escaping_and_forfeit_all_rights_to_community_support (bool):
+                            Disable string escape non-ASCII characters, might cause unwanted side
+                            effects(use at your own risk)
+      console_output_style (string):
+                            Console output: "classic", or with additional progress information
+                            ("progress" (percentage) | "count" | "progress-even-when-capture-no" (forces
+                            progress even when capture=no)
+      verbosity_test_cases (string):
+                            Specify a verbosity level for test case execution, overriding the main
+                            level. Higher levels will provide more detailed information about each test
+                            case executed.
+      xfail_strict (bool):  Default for the strict parameter of xfail markers when not given explicitly
+                            (default: False)
+      tmp_path_retention_count (string):
+                            How many sessions should we keep the `tmp_path` directories, according to
+                            `tmp_path_retention_policy`.
+      tmp_path_retention_policy (string):
+                            Controls which directories created by the `tmp_path` fixture are kept
+                            around, based on test outcome. (all/failed/none)
+      enable_assertion_pass_hook (bool):
+                            Enables the pytest_assertion_pass hook. Make sure to delete any previously
+                            generated pyc cache files.
+      verbosity_assertions (string):
+                            Specify a verbosity level for assertions, overriding the main level. Higher
+                            levels will provide more detailed explanation when an assertion fails.
+      junit_suite_name (string):
+                            Test suite name for JUnit report
+      junit_logging (string):
+                            Write captured log messages to JUnit report: one of
+                            no|log|system-out|system-err|out-err|all
+      junit_log_passing_tests (bool):
+                            Capture log information for passing tests to JUnit report:
+      junit_duration_report (string):
+                            Duration time to report: one of total|call
+      junit_family (string):
+                            Emit XML for schema: one of legacy|xunit1|xunit2
+      doctest_optionflags (args):
+                            Option flags for doctests
+      doctest_encoding (string):
+                            Encoding used for doctest files
+      cache_dir (string):   Cache directory path
+      log_level (string):   Default value for --log-level
+      log_format (string):  Default value for --log-format
+      log_date_format (string):
+                            Default value for --log-date-format
+      log_cli (bool):       Enable log display during test run (also known as "live logging")
+      log_cli_level (string):
+                            Default value for --log-cli-level
+      log_cli_format (string):
+                            Default value for --log-cli-format
+      log_cli_date_format (string):
+                            Default value for --log-cli-date-format
+      log_file (string):    Default value for --log-file
+      log_file_mode (string):
+                            Default value for --log-file-mode
+      log_file_level (string):
+                            Default value for --log-file-level
+      log_file_format (string):
+                            Default value for --log-file-format
+      log_file_date_format (string):
+                            Default value for --log-file-date-format
+      log_auto_indent (string):
+                            Default value for --log-auto-indent
+      pythonpath (paths):   Add paths to sys.path
+      faulthandler_timeout (string):
+                            Dump the traceback of all threads if a test takes more than TIMEOUT seconds
+                            to finish
+      addopts (args):       Extra command line options
+      minversion (string):  Minimally required pytest version
+      required_plugins (args):
+                            Plugins that must be present for pytest to run
+
+    Environment variables:
+      PYTEST_ADDOPTS           Extra command line options
+      PYTEST_PLUGINS           Comma-separated plugins to load during startup
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD Set to disable plugin auto-loading
+      PYTEST_DEBUG             Set to enable debug tracing of pytest's internals
+
+
+    to see available markers type: pytest --markers
+    to see available fixtures type: pytest --fixtures
+    (shown according to specified file_or_dir or current dir if not specified; fixtures with leading '_' are only shown with the '-v' option
 
     ----- stderr -----
     Resolved [N] packages in [TIME]
@@ -44,7 +470,7 @@ fn tool_run_args() {
      + packaging==24.0
      + pluggy==1.4.0
      + pytest==8.1.1
-    "###);
+    "#);
 
     // Can use `--` to separate uv arguments from the command arguments.
     uv_snapshot!(context.filters(), context.tool_run()
