@@ -4,12 +4,14 @@ use std::fmt::Write;
 use std::str::FromStr;
 use std::{cmp::Ordering, path::Path};
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use owo_colors::OwoColorize;
 
 use uv_cli::version::VersionInfo;
 use uv_cli::{VersionBump, VersionFormat};
+use uv_fs::Simplified;
 use uv_pep440::Version;
+use uv_workspace::pyproject_mut::Error;
 use uv_workspace::{
     pyproject_mut::{DependencyTarget, PyProjectTomlMut},
     DiscoveryOptions, Workspace, WorkspaceCache,
@@ -36,22 +38,16 @@ pub(crate) async fn metadata_version(
             Err(err) => {
                 // If strict, hard bail on missing workspace
                 if strict {
-                    Err(err)?;
+                    return Err(err)?;
                 }
                 // Otherwise, warn and provide fallback
                 writeln!(
                     printer.stderr(),
-                    "warning: failed to find a project, running `uv --version`"
+                    r"warning: failed to read project: {err}
+  running `uv --version` for compatibility with old `uv version` command.
+  this fallback will be removed soon, pass `--project .` to make this an error.
+"
                 )?;
-                writeln!(
-                    printer.stderr(),
-                    "  this behaviour will be deprecated in future versions."
-                )?;
-                writeln!(
-                    printer.stderr(),
-                    "  pass `--project .` to disable this fallback mode."
-                )?;
-
                 let version_info = uv_cli::version::version();
 
                 match output_format {
@@ -71,12 +67,23 @@ pub(crate) async fn metadata_version(
         &workspace.pyproject_toml().raw,
         DependencyTarget::PyProjectToml,
     )?;
+    let pyproject_path = workspace.install_path().join("pyproject.toml");
     let name = workspace
         .pyproject_toml()
         .project
         .as_ref()
         .map(|project| &project.name);
-    let old_version = pyproject.version()?;
+    let old_version = pyproject.version().map_err(|err| match err {
+        Error::MalformedWorkspace => {
+            anyhow!(
+                "There is no 'project.version' field in: {}",
+                pyproject_path.user_display()
+            )
+        }
+        err => {
+            anyhow!("{err}: {}", pyproject_path.user_display())
+        }
+    })?;
 
     // Figure out new metadata
     let new_version = if let Some(value) = value {
@@ -91,7 +98,6 @@ pub(crate) async fn metadata_version(
     if let Some(new_version) = &new_version {
         if !dry_run {
             pyproject.set_version(new_version)?;
-            let pyproject_path = workspace.install_path().join("pyproject.toml");
             fs_err::write(pyproject_path, pyproject.to_string())?;
         }
     }

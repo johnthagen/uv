@@ -42,6 +42,47 @@ fn version_get() -> Result<()> {
     Ok(())
 }
 
+// Print the version (json format)
+#[test]
+fn version_get_json() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(
+        r#"
+        [project]
+        name = "myproject"
+        version = "1.10.31"
+        requires-python = ">=3.12"
+        "#,
+    )?;
+
+    uv_snapshot!(context.filters(), context.metadata_version()
+        .arg("--output-format").arg("json"), @r#"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    {
+      "version": "1.10.31",
+      "commit_info": null
+    }
+
+    ----- stderr -----
+    "#);
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r#"
+    [project]
+    name = "myproject"
+    version = "1.10.31"
+    requires-python = ">=3.12"
+    "#
+    );
+    Ok(())
+}
+
 // Print the version (--short)
 #[test]
 fn version_get_short() -> Result<()> {
@@ -654,6 +695,169 @@ requires-python = ">=3.12"
     name = "myproject"
     version = "1.10.31"
     requires-python = ">=3.12"
+    "#
+    );
+    Ok(())
+}
+
+// Dynamic version should error on read
+#[test]
+fn version_get_dynamic() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(
+        r#"
+        [project]
+        name = "myproject"
+        dynamic = ["version"]
+        requires-python = ">=3.12"
+        "#,
+    )?;
+
+    uv_snapshot!(context.filters(), context.metadata_version(), @r"
+    success: false
+    exit_code: 2
+    ----- stdout -----
+
+    ----- stderr -----
+    error: There is no 'project.version' field in: pyproject.toml
+    ");
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r#"
+    [project]
+    name = "myproject"
+    dynamic = ["version"]
+    requires-python = ">=3.12"
+    "#
+    );
+    Ok(())
+}
+
+// Dynamic version should error on write
+#[test]
+fn version_set_dynamic() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(
+        r#"
+        [project]
+        name = "myproject"
+        dynamic = ["version"]
+        requires-python = ">=3.12"
+        "#,
+    )?;
+
+    uv_snapshot!(context.filters(), context.metadata_version()
+        .arg("0.1.2"), @r"
+    success: false
+    exit_code: 2
+    ----- stdout -----
+
+    ----- stderr -----
+    error: There is no 'project.version' field in: pyproject.toml
+    ");
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r#"
+    [project]
+    name = "myproject"
+    dynamic = ["version"]
+    requires-python = ">=3.12"
+    "#
+    );
+    Ok(())
+}
+
+// Should fallback to `uv --version` if this pyproject.toml isn't usable for whatever reason
+// (In this case, because tool.uv.managed = false)
+#[test]
+fn version_get_fallback() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(
+        r#"
+        [project]
+        name = "myapp"
+        version = "0.6.11"
+        
+        [tool.uv]
+        managed = false
+        "#,
+    )?;
+
+    uv_snapshot!(context.filters(), context.metadata_version(), @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    uv [VERSION] ([COMMIT] DATE)
+
+    ----- stderr -----
+    warning: failed to read project: The project is marked as unmanaged: `[TEMP_DIR]/`
+      running `uv --version` for compatibility with old `uv version` command.
+      this fallback will be removed soon, pass `--project .` to make this an error.
+    ");
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r#"
+    [project]
+    name = "myapp"
+    version = "0.6.11"
+
+    [tool.uv]
+    managed = false
+    "#
+    );
+    Ok(())
+}
+
+// Should error if this pyproject.toml isn't usable for whatever reason
+// and --project was passed explicitly.
+#[test]
+fn version_get_fallback_strict() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(
+        r#"
+        [project]
+        name = "myapp"
+        version = "0.6.11"
+        
+        [tool.uv]
+        managed = false
+        "#,
+    )?;
+
+    uv_snapshot!(context.filters(), context.metadata_version()
+        .arg("--project").arg("."), @r"
+    success: false
+    exit_code: 2
+    ----- stdout -----
+
+    ----- stderr -----
+    error: The project is marked as unmanaged: `[TEMP_DIR]/`
+    ");
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r#"
+    [project]
+    name = "myapp"
+    version = "0.6.11"
+
+    [tool.uv]
+    managed = false
     "#
     );
     Ok(())
