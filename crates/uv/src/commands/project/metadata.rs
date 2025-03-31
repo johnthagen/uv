@@ -1,14 +1,14 @@
 //! `uv metadata`
 
-use std::cmp::Ordering;
 use std::fmt::Write;
 use std::str::FromStr;
+use std::{cmp::Ordering, path::Path};
 
 use anyhow::Result;
 use owo_colors::OwoColorize;
 
-use uv_cli::VersionBump;
-use uv_fs::CWD;
+use uv_cli::version::VersionInfo;
+use uv_cli::{VersionBump, VersionFormat};
 use uv_pep440::Version;
 use uv_workspace::{
     pyproject_mut::{DependencyTarget, PyProjectTomlMut},
@@ -19,15 +19,54 @@ use crate::{commands::ExitStatus, printer::Printer};
 
 /// Read or update project version (`uv metadata version`)
 pub(crate) async fn metadata_version(
+    project_dir: &Path,
     value: Option<String>,
     bump: Option<VersionBump>,
     dry_run: bool,
     short: bool,
+    output_format: VersionFormat,
+    strict: bool,
     cache: &WorkspaceCache,
     printer: Printer,
 ) -> Result<ExitStatus> {
     // Read the metadata
-    let workspace = Workspace::discover(&CWD, &DiscoveryOptions::default(), cache).await?;
+    let workspace =
+        match Workspace::discover(project_dir, &DiscoveryOptions::default(), cache).await {
+            Ok(workspace) => workspace,
+            Err(err) => {
+                // If strict, hard bail on missing workspace
+                if strict {
+                    Err(err)?;
+                }
+                // Otherwise, warn and provide fallback
+                writeln!(
+                    printer.stderr(),
+                    "warning: failed to find a project, running `uv --version`"
+                )?;
+                writeln!(
+                    printer.stderr(),
+                    "  this behaviour will be deprecated in future versions."
+                )?;
+                writeln!(
+                    printer.stderr(),
+                    "  pass `--project .` to disable this fallback mode."
+                )?;
+
+                let version_info = uv_cli::version::version();
+
+                match output_format {
+                    VersionFormat::Text => {
+                        writeln!(printer.stdout(), "uv {version_info}")?;
+                    }
+                    VersionFormat::Json => {
+                        let string = serde_json::to_string_pretty(&version_info)?;
+                        writeln!(printer.stdout(), "{string}")?;
+                    }
+                };
+                return Ok(ExitStatus::Success);
+            }
+        };
+
     let mut pyproject = PyProjectTomlMut::from_toml(
         &workspace.pyproject_toml().raw,
         DependencyTarget::PyProjectToml,
@@ -58,25 +97,36 @@ pub(crate) async fn metadata_version(
     }
 
     // Report the results
-    if let Some(name) = name {
-        if !short {
-            write!(printer.stdout(), "{name} ")?;
+    match output_format {
+        VersionFormat::Text => {
+            if let Some(name) = name {
+                if !short {
+                    write!(printer.stdout(), "{name} ")?;
+                }
+            }
+            if let Some(new_version) = new_version {
+                if short {
+                    writeln!(printer.stdout(), "{}", new_version.cyan(),)?;
+                } else {
+                    writeln!(
+                        printer.stdout(),
+                        "{} => {}",
+                        old_version.cyan(),
+                        new_version.cyan()
+                    )?;
+                }
+            } else {
+                writeln!(printer.stdout(), "{}", old_version.cyan(),)?;
+            }
+        }
+        VersionFormat::Json => {
+            let final_version = new_version.unwrap_or(old_version);
+            let version_info = VersionInfo::from(final_version);
+            let string = serde_json::to_string_pretty(&version_info)?;
+            writeln!(printer.stdout(), "{string}")?;
         }
     }
-    if let Some(new_version) = new_version {
-        if short {
-            writeln!(printer.stdout(), "{}", new_version.cyan(),)?;
-        } else {
-            writeln!(
-                printer.stdout(),
-                "{} => {}",
-                old_version.cyan(),
-                new_version.cyan()
-            )?;
-        }
-    } else {
-        writeln!(printer.stdout(), "{}", old_version.cyan(),)?;
-    }
+
     Ok(ExitStatus::Success)
 }
 

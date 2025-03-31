@@ -1033,9 +1033,23 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                     bump,
                     dry_run,
                     short,
+                    output_format,
                 }),
         }) => {
-            commands::metadata_version(value, bump, dry_run, short, &workspace_cache, printer).await
+            // If they specified a project, they probably don't want `uv --version` semantics
+            let strict = cli.top_level.global_args.project.is_some();
+            commands::metadata_version(
+                &project_dir,
+                value,
+                bump,
+                dry_run,
+                short,
+                output_format,
+                strict,
+                &workspace_cache,
+                printer,
+            )
+            .await
         }
         Commands::Version { output_format } => {
             commands::version(output_format, &mut stdout())?;

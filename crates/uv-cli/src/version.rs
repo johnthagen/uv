@@ -3,6 +3,7 @@
 use std::fmt;
 
 use serde::Serialize;
+use uv_pep508::uv_pep440::Version;
 
 /// Information about the git repository where uv was built from.
 #[derive(Serialize)]
@@ -38,6 +39,15 @@ impl fmt::Display for VersionInfo {
         }
 
         Ok(())
+    }
+}
+
+impl From<Version> for VersionInfo {
+    fn from(version: Version) -> Self {
+        Self {
+            version: version.to_string(),
+            commit_info: None,
+        }
     }
 }
 

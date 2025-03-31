@@ -560,6 +560,8 @@ pub struct MetadataVersionArgs {
     /// Only print the final value
     #[arg(long)]
     pub short: bool,
+    #[arg(long, value_enum, default_value = "text")]
+    pub output_format: VersionFormat,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, clap::ValueEnum)]
