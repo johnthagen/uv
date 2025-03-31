@@ -9746,7 +9746,7 @@ uv metadata version [OPTIONS] [VALUE]
 <p>When disabled, uv will only use locally cached data and locally available files.</p>
 
 <p>May also be set with the <code>UV_OFFLINE</code> environment variable.</p>
-</dd><dt id="uv-metadata-version--project"><a href="#uv-metadata-version--project"><code>--project</code></a> <i>project</i></dt><dd><p>Run the command within the given project directory.</p>
+</dd><dt id="uv-metadata-version--output-format"><a href="#uv-metadata-version--output-format"><code>--output-format</code></a> <i>output-format</i></dt><dt id="uv-metadata-version--project"><a href="#uv-metadata-version--project"><code>--project</code></a> <i>project</i></dt><dd><p>Run the command within the given project directory.</p>
 
 <p>All <code>pyproject.toml</code>, <code>uv.toml</code>, and <code>.python-version</code> files will be discovered by walking up the directory tree from the project root, as will the project&#8217;s virtual environment (<code>.venv</code>).</p>
 
@@ -9756,7 +9756,10 @@ uv metadata version [OPTIONS] [VALUE]
 
 <p>This setting has no effect when used in the <code>uv pip</code> interface.</p>
 
-</dd><dt id="uv-metadata-version--quiet"><a href="#uv-metadata-version--quiet"><code>--quiet</code></a>, <code>-q</code></dt><dd><p>Do not print any output</p>
+<p>May also be set with the <code>UV_PROJECT</code> environment variable.</p>
+</dd><dt id="uv-metadata-version--quiet"><a href="#uv-metadata-version--quiet"><code>--quiet</code></a>, <code>-q</code></dt><dd><p>Use quiet output.</p>
+
+<p>Repeating this option, e.g., <code>-qq</code>, will enable a silent mode in which uv will write no output to stdout.</p>
 
 </dd><dt id="uv-metadata-version--short"><a href="#uv-metadata-version--short"><code>--short</code></a></dt><dd><p>Only print the final value</p>
 
