@@ -19,16 +19,16 @@ use tokio::task::spawn_blocking;
 use tracing::{debug, instrument};
 use uv_cache::{Cache, Refresh};
 use uv_cache_info::Timestamp;
+#[cfg(feature = "self-update")]
+use uv_cli::SelfUpdateArgs;
 use uv_cli::{
     compat::CompatArgs, BuildBackendCommand, CacheCommand, CacheNamespace, Cli, Commands,
     PipCommand, PipNamespace, ProjectCommand,
 };
 use uv_cli::{
-    MetadataCommand, MetadataNamespace, MetadataVersionArgs, PythonCommand, PythonNamespace,
-    ToolCommand, ToolNamespace, TopLevelArgs,
+    PythonCommand, PythonNamespace, SelfCommand, SelfNamespace, ToolCommand, ToolNamespace,
+    TopLevelArgs, VersionArgs,
 };
-#[cfg(feature = "self-update")]
-use uv_cli::{SelfCommand, SelfNamespace, SelfUpdateArgs};
 use uv_fs::{Simplified, CWD};
 use uv_pep508::VersionOrUrl;
 use uv_pypi_types::{ParsedDirectoryUrl, ParsedUrl};
@@ -361,7 +361,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
     // Don't initialize the rayon threadpool yet, this is too costly when we're doing a noop sync.
     uv_configuration::RAYON_PARALLELISM.store(globals.concurrency.installs, Ordering::SeqCst);
 
-    debug!("uv {}", uv_cli::version::version());
+    debug!("uv {}", uv_cli::version::uv_self_version());
 
     // Write out any resolved settings.
     macro_rules! show_settings {
@@ -1019,6 +1019,16 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                     token,
                 }),
         }) => commands::self_update(target_version, token, printer).await,
+        Commands::Self_(SelfNamespace {
+            command:
+                SelfCommand::Version {
+                    short,
+                    output_format,
+                },
+        }) => {
+            commands::self_version(short, output_format, printer)?;
+            Ok(ExitStatus::Success)
+        }
         #[cfg(not(feature = "self-update"))]
         Commands::Self_(_) => {
             anyhow::bail!(
@@ -1026,19 +1036,16 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 is not available. Please use your package manager to update uv."
             );
         }
-        Commands::Metadata(MetadataNamespace {
-            command:
-                MetadataCommand::Version(MetadataVersionArgs {
-                    value,
-                    bump,
-                    dry_run,
-                    short,
-                    output_format,
-                }),
+        Commands::Version(VersionArgs {
+            value,
+            bump,
+            dry_run,
+            short,
+            output_format,
         }) => {
             // If they specified a project, they probably don't want `uv --version` semantics
             let strict = cli.top_level.global_args.project.is_some();
-            commands::metadata_version(
+            commands::project_version(
                 &project_dir,
                 value,
                 bump,
@@ -1051,10 +1058,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
             )
             .await
         }
-        Commands::Version { output_format } => {
-            commands::version(output_format, &mut stdout())?;
-            Ok(ExitStatus::Success)
-        }
+
         Commands::GenerateShellCompletion(args) => {
             args.shell.generate(&mut Cli::command(), &mut stdout());
             Ok(ExitStatus::Success)

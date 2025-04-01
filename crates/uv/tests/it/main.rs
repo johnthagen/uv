@@ -39,7 +39,7 @@ mod lock_conflict;
 
 mod lock_scenarios;
 
-mod metadata;
+mod version;
 
 mod pip_check;
 

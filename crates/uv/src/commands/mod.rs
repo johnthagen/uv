@@ -25,7 +25,6 @@ pub(crate) use project::add::add;
 pub(crate) use project::export::export;
 pub(crate) use project::init::{init, InitKind, InitProjectKind};
 pub(crate) use project::lock::lock;
-pub(crate) use project::metadata::metadata_version;
 pub(crate) use project::remove::remove;
 pub(crate) use project::run::{run, RunCommand};
 pub(crate) use project::sync::sync;
@@ -57,7 +56,7 @@ use uv_normalize::PackageName;
 use uv_python::PythonEnvironment;
 use uv_scripts::Pep723Script;
 pub(crate) use venv::venv;
-pub(crate) use version::version;
+pub(crate) use version::{project_version, self_version};
 
 use crate::printer::Printer;
 

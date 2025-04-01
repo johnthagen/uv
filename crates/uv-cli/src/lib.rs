@@ -74,7 +74,7 @@ const STYLES: Styles = Styles::styled()
     .placeholder(AnsiColor::Cyan.on_default());
 
 #[derive(Parser)]
-#[command(name = "uv", author, long_version = crate::version::version())]
+#[command(name = "uv", author, long_version = crate::version::uv_self_version())]
 #[command(about = "An extremely fast Python package manager.")]
 #[command(propagate_version = true)]
 #[command(
@@ -494,16 +494,11 @@ pub enum Commands {
     /// Clear the cache, removing all entries or those linked to specific packages.
     #[command(hide = true)]
     Clean(CleanArgs),
-    /// Display uv's version
-    Version {
-        #[arg(long, value_enum, default_value = "text")]
-        output_format: VersionFormat,
-    },
+    /// Read or update the project's version.
+    Version(VersionArgs),
     /// Generate shell completion
     #[command(alias = "--generate-shell-completion", hide = true)]
     GenerateShellCompletion(GenerateShellCompletionArgs),
-    /// Read or edit project metadata
-    Metadata(MetadataNamespace),
     /// Display documentation for a command.
     // To avoid showing the global options when displaying help for the help command, we are
     // responsible for maintaining the options using the `after_help`.
@@ -531,21 +526,9 @@ pub struct HelpArgs {
     pub command: Option<Vec<String>>,
 }
 
-#[derive(Args)]
-pub struct MetadataNamespace {
-    #[command(subcommand)]
-    pub command: MetadataCommand,
-}
-
-#[derive(Subcommand)]
-pub enum MetadataCommand {
-    /// Update the project's version.
-    Version(MetadataVersionArgs),
-}
-
 #[derive(Args, Debug)]
 #[command(group = clap::ArgGroup::new("operation"))]
-pub struct MetadataVersionArgs {
+pub struct VersionArgs {
     /// Set the project version to this value
     #[arg(group = "operation")]
     pub value: Option<String>,
@@ -584,6 +567,14 @@ pub struct SelfNamespace {
 pub enum SelfCommand {
     /// Update uv.
     Update(SelfUpdateArgs),
+    /// Display uv's version
+    Version {
+        /// Only print the version
+        #[arg(long)]
+        short: bool,
+        #[arg(long, value_enum, default_value = "text")]
+        output_format: VersionFormat,
+    },
 }
 
 #[derive(Args, Debug)]

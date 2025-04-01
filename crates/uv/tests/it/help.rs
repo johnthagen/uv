@@ -32,9 +32,8 @@ fn help() {
       publish                    Upload distributions to an index
       cache                      Manage uv's cache
       self                       Manage the uv executable
-      version                    Display uv's version
+      version                    Read or update the project's version
       generate-shell-completion  Generate shell completion
-      metadata                   Read or edit project metadata
       help                       Display documentation for a command
 
     Cache options:
@@ -97,25 +96,24 @@ fn help_flag() {
     Usage: uv [OPTIONS] <COMMAND>
 
     Commands:
-      run       Run a command or script
-      init      Create a new project
-      add       Add dependencies to the project
-      remove    Remove dependencies from the project
-      sync      Update the project's environment
-      lock      Update the project's lockfile
-      export    Export the project's lockfile to an alternate format
-      tree      Display the project's dependency tree
-      tool      Run and install commands provided by Python packages
-      python    Manage Python versions and installations
-      pip       Manage Python packages with a pip-compatible interface
-      venv      Create a virtual environment
-      build     Build Python packages into source distributions and wheels
-      publish   Upload distributions to an index
-      cache     Manage uv's cache
-      self      Manage the uv executable
-      version   Display uv's version
-      metadata  Read or edit project metadata
-      help      Display documentation for a command
+      run      Run a command or script
+      init     Create a new project
+      add      Add dependencies to the project
+      remove   Remove dependencies from the project
+      sync     Update the project's environment
+      lock     Update the project's lockfile
+      export   Export the project's lockfile to an alternate format
+      tree     Display the project's dependency tree
+      tool     Run and install commands provided by Python packages
+      python   Manage Python versions and installations
+      pip      Manage Python packages with a pip-compatible interface
+      venv     Create a virtual environment
+      build    Build Python packages into source distributions and wheels
+      publish  Upload distributions to an index
+      cache    Manage uv's cache
+      self     Manage the uv executable
+      version  Read or update the project's version
+      help     Display documentation for a command
 
     Cache options:
       -n, --no-cache               Avoid reading from or writing to the cache, instead using a temporary
@@ -176,25 +174,24 @@ fn help_short_flag() {
     Usage: uv [OPTIONS] <COMMAND>
 
     Commands:
-      run       Run a command or script
-      init      Create a new project
-      add       Add dependencies to the project
-      remove    Remove dependencies from the project
-      sync      Update the project's environment
-      lock      Update the project's lockfile
-      export    Export the project's lockfile to an alternate format
-      tree      Display the project's dependency tree
-      tool      Run and install commands provided by Python packages
-      python    Manage Python versions and installations
-      pip       Manage Python packages with a pip-compatible interface
-      venv      Create a virtual environment
-      build     Build Python packages into source distributions and wheels
-      publish   Upload distributions to an index
-      cache     Manage uv's cache
-      self      Manage the uv executable
-      version   Display uv's version
-      metadata  Read or edit project metadata
-      help      Display documentation for a command
+      run      Run a command or script
+      init     Create a new project
+      add      Add dependencies to the project
+      remove   Remove dependencies from the project
+      sync     Update the project's environment
+      lock     Update the project's lockfile
+      export   Export the project's lockfile to an alternate format
+      tree     Display the project's dependency tree
+      tool     Run and install commands provided by Python packages
+      python   Manage Python versions and installations
+      pip      Manage Python packages with a pip-compatible interface
+      venv     Create a virtual environment
+      build    Build Python packages into source distributions and wheels
+      publish  Upload distributions to an index
+      cache    Manage uv's cache
+      self     Manage the uv executable
+      version  Read or update the project's version
+      help     Display documentation for a command
 
     Cache options:
       -n, --no-cache               Avoid reading from or writing to the cache, instead using a temporary
@@ -869,7 +866,6 @@ fn help_unknown_subcommand() {
         cache
         self
         version
-        metadata
         generate-shell-completion
     ");
 
@@ -897,7 +893,6 @@ fn help_unknown_subcommand() {
         cache
         self
         version
-        metadata
         generate-shell-completion
     ");
 }
@@ -951,9 +946,8 @@ fn help_with_global_option() {
       publish                    Upload distributions to an index
       cache                      Manage uv's cache
       self                       Manage the uv executable
-      version                    Display uv's version
+      version                    Read or update the project's version
       generate-shell-completion  Generate shell completion
-      metadata                   Read or edit project metadata
       help                       Display documentation for a command
 
     Cache options:
@@ -1067,9 +1061,8 @@ fn help_with_no_pager() {
       publish                    Upload distributions to an index
       cache                      Manage uv's cache
       self                       Manage the uv executable
-      version                    Display uv's version
+      version                    Read or update the project's version
       generate-shell-completion  Generate shell completion
-      metadata                   Read or edit project metadata
       help                       Display documentation for a command
 
     Cache options:

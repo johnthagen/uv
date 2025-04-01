@@ -20,7 +20,7 @@ fn version_get() -> Result<()> {
         "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version(), @r"
+    uv_snapshot!(context.filters(), context.version(), @r"
     success: true
     exit_code: 0
     ----- stdout -----
@@ -57,12 +57,13 @@ fn version_get_json() -> Result<()> {
         "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("--output-format").arg("json"), @r#"
     success: true
     exit_code: 0
     ----- stdout -----
     {
+      "package_name": "myproject",
       "version": "1.10.31",
       "commit_info": null
     }
@@ -98,7 +99,7 @@ fn version_get_short() -> Result<()> {
         "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("--short"), @r"
     success: true
     exit_code: 0
@@ -137,7 +138,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("1.1.1"), @r"
     success: true
     exit_code: 0
@@ -176,7 +177,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("1.1.1")
         .arg("--short"), @r"
     success: true
@@ -216,7 +217,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("--bump").arg("patch"), @r"
     success: true
     exit_code: 0
@@ -254,7 +255,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("--bump").arg("patch")
         .arg("--short"), @r"
     success: true
@@ -293,7 +294,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("--bump").arg("minor"), @r"
     success: true
     exit_code: 0
@@ -331,7 +332,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("--bump").arg("major"), @r"
     success: true
     exit_code: 0
@@ -369,7 +370,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("--bump").arg("patch"), @r"
     success: true
     exit_code: 0
@@ -407,7 +408,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("--bump").arg("minor"), @r"
     success: true
     exit_code: 0
@@ -445,7 +446,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("--bump").arg("major"), @r"
     success: true
     exit_code: 0
@@ -483,7 +484,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("--bump").arg("major"), @r"
     success: true
     exit_code: 0
@@ -522,7 +523,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("--bump").arg("major"), @r"
     success: true
     exit_code: 0
@@ -561,7 +562,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("1.2.3")
         .arg("--dry-run"), @r"
     success: true
@@ -600,7 +601,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("--bump").arg("major")
         .arg("--dry-run"), @r"
     success: true
@@ -639,7 +640,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("abcd"), @r"
     success: false
     exit_code: 2
@@ -677,7 +678,7 @@ requires-python = ">=3.12"
 "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("minor"), @r"
     success: false
     exit_code: 2
@@ -715,7 +716,7 @@ fn version_get_dynamic() -> Result<()> {
         "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version(), @r"
+    uv_snapshot!(context.filters(), context.version(), @r"
     success: false
     exit_code: 2
     ----- stdout -----
@@ -752,7 +753,7 @@ fn version_set_dynamic() -> Result<()> {
         "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("0.1.2"), @r"
     success: false
     exit_code: 2
@@ -786,14 +787,14 @@ fn version_get_fallback() -> Result<()> {
         r#"
         [project]
         name = "myapp"
-        version = "0.6.11"
+        version = "0.1.2"
         
         [tool.uv]
         managed = false
         "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version(), @r"
+    uv_snapshot!(context.filters(), context.version(), @r"
     success: true
     exit_code: 0
     ----- stdout -----
@@ -801,7 +802,7 @@ fn version_get_fallback() -> Result<()> {
 
     ----- stderr -----
     warning: failed to read project: The project is marked as unmanaged: `[TEMP_DIR]/`
-      running `uv --version` for compatibility with old `uv version` command.
+      running `uv self version` for compatibility with old `uv version` command.
       this fallback will be removed soon, pass `--project .` to make this an error.
     ");
 
@@ -811,7 +812,133 @@ fn version_get_fallback() -> Result<()> {
     @r#"
     [project]
     name = "myapp"
-    version = "0.6.11"
+    version = "0.1.2"
+
+    [tool.uv]
+    managed = false
+    "#
+    );
+    Ok(())
+}
+
+// version_get_fallback with `--short`
+#[test]
+fn version_get_fallback_short() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(
+        r#"
+        [project]
+        name = "myapp"
+        version = "0.1.2"
+        
+        [tool.uv]
+        managed = false
+        "#,
+    )?;
+
+    let filters = context
+        .filters()
+        .into_iter()
+        .chain([(
+            r"\d+\.\d+\.\d+(\+\d+)?( \(.*\))?",
+            r"[VERSION] ([COMMIT] DATE)",
+        )])
+        .collect::<Vec<_>>();
+    uv_snapshot!(filters, context.version()
+        .arg("--short"), @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    [VERSION] ([COMMIT] DATE)
+
+    ----- stderr -----
+    warning: failed to read project: The project is marked as unmanaged: `[TEMP_DIR]/`
+      running `uv self version` for compatibility with old `uv version` command.
+      this fallback will be removed soon, pass `--project .` to make this an error.
+    ");
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r#"
+    [project]
+    name = "myapp"
+    version = "0.1.2"
+
+    [tool.uv]
+    managed = false
+    "#
+    );
+    Ok(())
+}
+
+// version_get_fallback with `--json`
+#[test]
+fn version_get_fallback_json() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(
+        r#"
+        [project]
+        name = "myapp"
+        version = "0.1.2"
+        
+        [tool.uv]
+        managed = false
+        "#,
+    )?;
+
+    let filters = context
+        .filters()
+        .into_iter()
+        .chain([
+            (r#"version": "\d+.\d+.\d+""#, r#"version": "[VERSION]""#),
+            (
+                r#"short_commit_hash": ".*""#,
+                r#"short_commit_hash": "[HASH]""#,
+            ),
+            (r#"commit_hash": ".*""#, r#"commit_hash": "[LONGHASH]""#),
+            (r#"commit_date": ".*""#, r#"commit_date": "[DATE]""#),
+            (r#"last_tag": ".*""#, r#"last_tag": "[TAG]""#),
+            (
+                r#"commits_since_last_tag": .*"#,
+                r#"commits_since_last_tag": [COUNT]"#,
+            ),
+        ])
+        .collect::<Vec<_>>();
+    uv_snapshot!(filters, context.version()
+        .arg("--output-format").arg("json"), @r#"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    {
+      "package_name": "uv",
+      "version": "[VERSION]",
+      "commit_info": {
+        "short_commit_hash": "[LONGHASH]",
+        "commit_hash": "[LONGHASH]",
+        "commit_date": "[DATE]",
+        "last_tag": "[TAG]",
+        "commits_since_last_tag": [COUNT]
+      }
+    }
+
+    ----- stderr -----
+    warning: failed to read project: The project is marked as unmanaged: `[TEMP_DIR]/`
+      running `uv self version` for compatibility with old `uv version` command.
+      this fallback will be removed soon, pass `--project .` to make this an error.
+    "#);
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r#"
+    [project]
+    name = "myapp"
+    version = "0.1.2"
 
     [tool.uv]
     managed = false
@@ -831,14 +958,14 @@ fn version_get_fallback_strict() -> Result<()> {
         r#"
         [project]
         name = "myapp"
-        version = "0.6.11"
+        version = "0.1.2"
         
         [tool.uv]
         managed = false
         "#,
     )?;
 
-    uv_snapshot!(context.filters(), context.metadata_version()
+    uv_snapshot!(context.filters(), context.version()
         .arg("--project").arg("."), @r"
     success: false
     exit_code: 2
@@ -854,10 +981,156 @@ fn version_get_fallback_strict() -> Result<()> {
     @r#"
     [project]
     name = "myapp"
-    version = "0.6.11"
+    version = "0.1.2"
 
     [tool.uv]
     managed = false
+    "#
+    );
+    Ok(())
+}
+
+// `uv self version`
+// (also setup a honeypot project and make sure it's not used)
+#[test]
+fn self_version() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(
+        r#"
+        [project]
+        name = "myapp"
+        version = "0.1.2"
+        "#,
+    )?;
+
+    uv_snapshot!(context.filters(), context.self_version(), @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    uv [VERSION] ([COMMIT] DATE)
+
+    ----- stderr -----
+    ");
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r#"
+    [project]
+    name = "myapp"
+    version = "0.1.2"
+    "#
+    );
+    Ok(())
+}
+
+// `uv self version --short`
+// (also setup a honeypot project and make sure it's not used)
+#[test]
+fn self_version_short() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(
+        r#"
+        [project]
+        name = "myapp"
+        version = "0.1.2"
+        "#,
+    )?;
+
+    let filters = context
+        .filters()
+        .into_iter()
+        .chain([(
+            r"\d+\.\d+\.\d+(\+\d+)?( \(.*\))?",
+            r"[VERSION] ([COMMIT] DATE)",
+        )])
+        .collect::<Vec<_>>();
+    uv_snapshot!(filters, context.self_version()
+        .arg("--short"), @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    [VERSION] ([COMMIT] DATE)
+
+    ----- stderr -----
+    ");
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r#"
+    [project]
+    name = "myapp"
+    version = "0.1.2"
+    "#
+    );
+    Ok(())
+}
+
+// `uv self version --output-format json`
+// (also setup a honeypot project and make sure it's not used)
+#[test]
+fn self_version_json() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(
+        r#"
+        [project]
+        name = "myapp"
+        version = "0.1.2"
+        "#,
+    )?;
+
+    let filters = context
+        .filters()
+        .into_iter()
+        .chain([
+            (r#"version": "\d+.\d+.\d+""#, r#"version": "[VERSION]""#),
+            (
+                r#"short_commit_hash": ".*""#,
+                r#"short_commit_hash": "[HASH]""#,
+            ),
+            (r#"commit_hash": ".*""#, r#"commit_hash": "[LONGHASH]""#),
+            (r#"commit_date": ".*""#, r#"commit_date": "[DATE]""#),
+            (r#"last_tag": ".*""#, r#"last_tag": "[TAG]""#),
+            (
+                r#"commits_since_last_tag": .*"#,
+                r#"commits_since_last_tag": [COUNT]"#,
+            ),
+        ])
+        .collect::<Vec<_>>();
+    uv_snapshot!(filters, context.self_version()
+        .arg("--output-format").arg("json"), @r#"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    {
+      "package_name": "uv",
+      "version": "[VERSION]",
+      "commit_info": {
+        "short_commit_hash": "[LONGHASH]",
+        "commit_hash": "[LONGHASH]",
+        "commit_date": "[DATE]",
+        "last_tag": "[TAG]",
+        "commits_since_last_tag": [COUNT]
+      }
+    }
+
+    ----- stderr -----
+    "#);
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r#"
+    [project]
+    name = "myapp"
+    version = "0.1.2"
     "#
     );
     Ok(())

@@ -825,9 +825,16 @@ impl TestContext {
         command
     }
 
-    pub fn metadata_version(&self) -> Command {
+    pub fn version(&self) -> Command {
         let mut command = self.new_command();
-        command.arg("metadata").arg("version");
+        command.arg("version");
+        self.add_shared_options(&mut command, false);
+        command
+    }
+
+    pub fn self_version(&self) -> Command {
+        let mut command = self.new_command();
+        command.arg("self").arg("version");
         self.add_shared_options(&mut command, false);
         command
     }
