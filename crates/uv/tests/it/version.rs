@@ -902,7 +902,7 @@ fn version_get_fallback_json() -> Result<()> {
             ),
             (r#"commit_hash": ".*""#, r#"commit_hash": "[LONGHASH]""#),
             (r#"commit_date": ".*""#, r#"commit_date": "[DATE]""#),
-            (r#"last_tag": ".*""#, r#"last_tag": "[TAG]""#),
+            (r#"last_tag": (".*"|null)"#, r#"last_tag": "[TAG]""#),
             (
                 r#"commits_since_last_tag": .*"#,
                 r#"commits_since_last_tag": [COUNT]"#,
@@ -1097,7 +1097,7 @@ fn self_version_json() -> Result<()> {
             ),
             (r#"commit_hash": ".*""#, r#"commit_hash": "[LONGHASH]""#),
             (r#"commit_date": ".*""#, r#"commit_date": "[DATE]""#),
-            (r#"last_tag": ".*""#, r#"last_tag": "[TAG]""#),
+            (r#"last_tag": (".*"|null)"#, r#"last_tag": "[TAG]""#),
             (
                 r#"commits_since_last_tag": .*"#,
                 r#"commits_since_last_tag": [COUNT]"#,
