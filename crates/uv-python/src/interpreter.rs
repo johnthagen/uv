@@ -163,7 +163,7 @@ impl Interpreter {
                 }
             }
         // }
-        // Ok(base_python)
+        Ok(base_python)
     }
 
     // FIXME: Doc
@@ -203,7 +203,7 @@ impl Interpreter {
             dbg!("*** Not if let Some(bin) = base_python.parent()");
         // }
         // dbg!("*** Not standalone!");
-        // Ok(base_python)
+        Ok(base_python)
     }
 
     /// Determine the base Python executable; that is, the Python executable that should be
