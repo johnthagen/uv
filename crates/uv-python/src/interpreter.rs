@@ -194,11 +194,15 @@ impl Interpreter {
                             "Using directory symlink instead of base Python: {}",
                             &path_link.display()
                         );
+                        dbg!("*** Using directory symlink instead of base Python");
                         return Ok(path_link);
                     }
+                    dbg!("*** Not if let Some(path) = bin.parent().and_then(Path::parent)");
                 }
             }
+            dbg!("*** Not if let Some(bin) = base_python.parent()");
         }
+        dbg!("*** Not standalone!");
         Ok(base_python)
     }
 
