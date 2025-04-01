@@ -139,7 +139,7 @@ impl Interpreter {
     // FIXME: Doc
     pub fn to_base_python_or_symlink(&self) -> Result<PathBuf, io::Error> {
         let base_python = self.to_base_python()?;
-        if self.is_standalone() {
+        // if self.is_standalone() {
             if let Some(bin) = base_python.parent() {
                 if bin
                     .components()
@@ -162,14 +162,14 @@ impl Interpreter {
                     }
                 }
             }
-        }
-        Ok(base_python)
+        // }
+        // Ok(base_python)
     }
 
     // FIXME: Doc
     pub fn to_base_python_or_symlink_path(&self) -> Result<PathBuf, io::Error> {
         let base_python = self.to_base_python()?;
-        if self.is_standalone() {
+        // if self.is_standalone() {
             if let Some(bin) = base_python.parent() {
                 if bin
                     .components()
@@ -201,9 +201,9 @@ impl Interpreter {
                 }
             }
             dbg!("*** Not if let Some(bin) = base_python.parent()");
-        }
-        dbg!("*** Not standalone!");
-        Ok(base_python)
+        // }
+        // dbg!("*** Not standalone!");
+        // Ok(base_python)
     }
 
     /// Determine the base Python executable; that is, the Python executable that should be
