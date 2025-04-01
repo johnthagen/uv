@@ -169,6 +169,7 @@ impl Interpreter {
     // FIXME: Doc
     pub fn to_base_python_or_symlink_path(&self) -> Result<PathBuf, io::Error> {
         let base_python = self.to_base_python()?;
+        dbg!("base_python: {:?}", base_python);
         // if self.is_standalone() {
             if let Some(bin) = base_python.parent() {
                 if bin
