@@ -139,7 +139,7 @@ impl Interpreter {
     // FIXME: Doc
     pub fn to_base_python_or_symlink(&self) -> Result<PathBuf, io::Error> {
         let base_python = self.to_base_python()?;
-        // if self.is_standalone() {
+        if self.is_standalone() {
             if let Some(parent) = base_python.parent() {
                 #[cfg(unix)]
                 {
@@ -188,7 +188,7 @@ impl Interpreter {
                     }
                 }
             }
-        // }
+        }
         Ok(base_python)
     }
 
@@ -196,7 +196,7 @@ impl Interpreter {
     pub fn to_base_python_or_symlink_path(&self) -> Result<PathBuf, io::Error> {
         let base_python = self.to_base_python()?;
         dbg!("base_python: {:?}", &base_python);
-        // if self.is_standalone() {
+        if self.is_standalone() {
             if let Some(parent) = base_python.parent() {
                 #[cfg(unix)]
                 {
@@ -261,8 +261,8 @@ impl Interpreter {
                 }
             }
             dbg!("*** Not if let Some(bin) = base_python.parent()");
-        // }
-        // dbg!("*** Not standalone!");
+        }
+        dbg!("*** Not standalone!");
         Ok(base_python)
     }
 
