@@ -171,34 +171,67 @@ impl Interpreter {
         let base_python = self.to_base_python()?;
         dbg!("base_python: {:?}", &base_python);
         // if self.is_standalone() {
-            if let Some(bin) = base_python.parent() {
-                if bin
-                    .components()
-                    .last()
-                    .is_some_and(|c| c.as_os_str() == "bin")
+            if let Some(parent) = base_python.parent() {
+                #[cfg(unix)]
                 {
-                    if let Some(path) = bin.parent().and_then(Path::parent) {
-                        let path_link = path
-                            .to_path_buf()
-                            .join(format!(
-                                "python{}.{}-dir",
-                                self.python_major(),
-                                self.python_minor(),
-                            ))
-                            .join("bin")
-                            .join(format!(
-                                "python{}.{}",
-                                self.python_major(),
-                                self.python_minor()
-                            ));
-                        debug!(
-                            "Using directory symlink instead of base Python: {}",
-                            &path_link.display()
-                        );
-                        dbg!("*** Using directory symlink instead of base Python");
-                        return Ok(path_link);
+                    if parent
+                        .components()
+                        .last()
+                        .is_some_and(|c| c.as_os_str() == "bin")
+                    {
+                        if let Some(path) = parent.parent().and_then(Path::parent) {
+                            let path_link = path
+                                .to_path_buf()
+                                .join(format!(
+                                    "python{}.{}-dir",
+                                    self.python_major(),
+                                    self.python_minor(),
+                                ))
+                                .join("bin")
+                                .join(format!(
+                                    "python{}.{}",
+                                    self.python_major(),
+                                    self.python_minor()
+                                ));
+                            debug!(
+                                "Using directory symlink instead of base Python: {}",
+                                &path_link.display()
+                            );
+                            dbg!("*** Using directory symlink instead of base Python");
+                            return Ok(path_link);
+                        }
+                        dbg!("*** Not if let Some(path) = bin.parent().and_then(Path::parent)");
                     }
-                    dbg!("*** Not if let Some(path) = bin.parent().and_then(Path::parent)");
+                }
+                #[cfg(windows)]
+                {
+                    if parent
+                        .components()
+                        .last()
+                        .is_some()
+                    {
+                        if let Some(path) = parent.parent() {
+                            let path_link = path
+                                .to_path_buf()
+                                .join(format!(
+                                    "python{}.{}-dir",
+                                    self.python_major(),
+                                    self.python_minor(),
+                                ))
+                                .join(format!(
+                                    "python{}.{}",
+                                    self.python_major(),
+                                    self.python_minor()
+                                ));
+                            debug!(
+                                "Using directory symlink instead of base Python: {}",
+                                &path_link.display()
+                            );
+                            dbg!("*** Using directory symlink instead of base Python");
+                            return Ok(path_link);
+                        }
+                        dbg!("*** Not if let Some(path) = bin.parent().and_then(Path::parent)");
+                    }
                 }
             }
             dbg!("*** Not if let Some(bin) = base_python.parent()");
