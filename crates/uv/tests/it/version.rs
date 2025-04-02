@@ -803,7 +803,7 @@ fn version_get_fallback_unmanaged() -> Result<()> {
     ----- stderr -----
     warning: failed to read project: The project is marked as unmanaged: `[TEMP_DIR]/`
       running `uv self version` for compatibility with old `uv version` command.
-      this fallback will be removed soon, pass `--project .` to make this an error.
+      this fallback will be removed soon, pass `--preview` to make this an error.
     ");
 
     let pyproject = fs_err::read_to_string(&pyproject_toml)?;
@@ -856,7 +856,7 @@ fn version_get_fallback_unmanaged_short() -> Result<()> {
     ----- stderr -----
     warning: failed to read project: The project is marked as unmanaged: `[TEMP_DIR]/`
       running `uv self version` for compatibility with old `uv version` command.
-      this fallback will be removed soon, pass `--project .` to make this an error.
+      this fallback will be removed soon, pass `--preview` to make this an error.
     ");
 
     let pyproject = fs_err::read_to_string(&pyproject_toml)?;
@@ -929,7 +929,7 @@ fn version_get_fallback_unmanaged_json() -> Result<()> {
     ----- stderr -----
     warning: failed to read project: The project is marked as unmanaged: `[TEMP_DIR]/`
       running `uv self version` for compatibility with old `uv version` command.
-      this fallback will be removed soon, pass `--project .` to make this an error.
+      this fallback will be removed soon, pass `--preview` to make this an error.
     "#);
 
     let pyproject = fs_err::read_to_string(&pyproject_toml)?;
@@ -998,6 +998,25 @@ fn version_get_fallback_missing_strict() -> Result<()> {
 
     uv_snapshot!(context.filters(), context.version()
         .arg("--project").arg("."), @r"
+    success: false
+    exit_code: 2
+    ----- stdout -----
+
+    ----- stderr -----
+    error: No `pyproject.toml` found in current directory or any parent directory
+    ");
+
+    Ok(())
+}
+
+// Should error if this pyproject.toml is missing
+// and --preview was passed explicitly.
+#[test]
+fn version_get_fallback_missing_strict_preview() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    uv_snapshot!(context.filters(), context.version()
+        .arg("--preview"), @r"
     success: false
     exit_code: 2
     ----- stdout -----

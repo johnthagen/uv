@@ -1044,7 +1044,8 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
             output_format,
         }) => {
             // If they specified a project, they probably don't want `uv --version` semantics
-            let strict = cli.top_level.global_args.project.is_some();
+            let strict =
+                cli.top_level.global_args.project.is_some() || globals.preview.is_enabled();
             commands::project_version(
                 &project_dir,
                 value,

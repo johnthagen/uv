@@ -55,7 +55,7 @@ pub(crate) async fn project_version(
                     printer.stderr(),
                     r"warning: failed to read project: {err}
   running `uv self version` for compatibility with old `uv version` command.
-  this fallback will be removed soon, pass `--project .` to make this an error.
+  this fallback will be removed soon, pass `--preview` to make this an error.
 "
                 )?;
                 return self_version(short, output_format, printer);
