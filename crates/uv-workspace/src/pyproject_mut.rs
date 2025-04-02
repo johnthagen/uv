@@ -994,6 +994,28 @@ impl PyProjectTomlMut {
         Version::from_str(version).map_err(|_| Error::MalformedWorkspace)
     }
 
+    pub fn has_dynamic_version(&mut self) -> bool {
+        let Ok(project) = self
+            .doc
+            .entry("project")
+            .or_insert(Item::Table(Table::new()))
+            .as_table()
+            .ok_or(Error::MalformedWorkspace)
+        else {
+            return false;
+        };
+
+        let Some(dynamic) = project
+            .get("dynamic")
+            .and_then(Item::as_value)
+            .and_then(Value::as_array)
+        else {
+            return false;
+        };
+
+        dynamic.iter().any(|val| val.as_str() == Some("version"))
+    }
+
     pub fn set_version(&mut self, version: &Version) -> Result<(), Error> {
         let project = self
             .doc

@@ -9578,6 +9578,8 @@ uv version [OPTIONS] [VALUE]
 
 <dl class="cli-reference"><dt id="uv-version--value"><a href="#uv-version--value"<code>VALUE</code></a></dt><dd><p>Set the project version to this value</p>
 
+<p>To update the project using semantic versioning components instead, use <code>--bump</code>.</p>
+
 </dd></dl>
 
 <h3 class="cli-reference">Options</h3>
@@ -9691,7 +9693,9 @@ uv version [OPTIONS] [VALUE]
 
 <p>Repeating this option, e.g., <code>-qq</code>, will enable a silent mode in which uv will write no output to stdout.</p>
 
-</dd><dt id="uv-version--short"><a href="#uv-version--short"><code>--short</code></a></dt><dd><p>Only print the final value</p>
+</dd><dt id="uv-version--short"><a href="#uv-version--short"><code>--short</code></a></dt><dd><p>Only show the version</p>
+
+<p>By default, uv will show the project name before the version.</p>
 
 </dd><dt id="uv-version--verbose"><a href="#uv-version--verbose"><code>--verbose</code></a>, <code>-v</code></dt><dd><p>Use verbose output.</p>
 

@@ -530,6 +530,8 @@ pub struct HelpArgs {
 #[command(group = clap::ArgGroup::new("operation"))]
 pub struct VersionArgs {
     /// Set the project version to this value
+    ///
+    /// To update the project using semantic versioning components instead, use `--bump`.
     #[arg(group = "operation")]
     pub value: Option<String>,
     /// Update the project version using the given semantics
@@ -540,7 +542,9 @@ pub struct VersionArgs {
     /// Instead, the version will be displayed.
     #[arg(long)]
     pub dry_run: bool,
-    /// Only print the final value
+    /// Only show the version
+    ///
+    /// By default, uv will show the project name before the version.
     #[arg(long)]
     pub short: bool,
     #[arg(long, value_enum, default_value = "text")]

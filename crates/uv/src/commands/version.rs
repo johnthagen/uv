@@ -74,10 +74,17 @@ pub(crate) async fn project_version(
         .map(|project| &project.name);
     let old_version = pyproject.version().map_err(|err| match err {
         Error::MalformedWorkspace => {
-            anyhow!(
-                "There is no 'project.version' field in: {}",
-                pyproject_path.user_display()
-            )
+            if pyproject.has_dynamic_version() {
+                anyhow!(
+                    "We cannot get or set dynamic project versions in: {}",
+                    pyproject_path.user_display()
+                )
+            } else {
+                anyhow!(
+                    "There is no 'project.version' field in: {}",
+                    pyproject_path.user_display()
+                )
+            }
         }
         err => {
             anyhow!("{err}: {}", pyproject_path.user_display())
@@ -86,7 +93,19 @@ pub(crate) async fn project_version(
 
     // Figure out new metadata
     let new_version = if let Some(value) = value {
-        Some(Version::from_str(&value)?)
+        match Version::from_str(&value) {
+            Ok(version) => Some(version),
+            Err(err) => match &*value {
+                "major" | "minor" | "patch" => {
+                    return Err(anyhow!(
+                        "Invalid version `{value}`, did you mean to pass `--bump {value}`?"
+                    ));
+                }
+                _ => {
+                    return Err(err)?;
+                }
+            },
+        }
     } else if let Some(bump) = bump {
         Some(bumped_version(&old_version, bump, printer)?)
     } else {

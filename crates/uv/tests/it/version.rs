@@ -685,7 +685,7 @@ requires-python = ">=3.12"
     ----- stdout -----
 
     ----- stderr -----
-    error: expected version to start with a number, but no leading ASCII digits were found
+    error: Invalid version `minor`, did you mean to pass `--bump minor`?
     ");
 
     let pyproject = fs_err::read_to_string(&pyproject_toml)?;
@@ -722,7 +722,7 @@ fn version_get_dynamic() -> Result<()> {
     ----- stdout -----
 
     ----- stderr -----
-    error: There is no 'project.version' field in: pyproject.toml
+    error: We cannot get or set dynamic project versions in: pyproject.toml
     ");
 
     let pyproject = fs_err::read_to_string(&pyproject_toml)?;
@@ -760,7 +760,7 @@ fn version_set_dynamic() -> Result<()> {
     ----- stdout -----
 
     ----- stderr -----
-    error: There is no 'project.version' field in: pyproject.toml
+    error: We cannot get or set dynamic project versions in: pyproject.toml
     ");
 
     let pyproject = fs_err::read_to_string(&pyproject_toml)?;
@@ -779,7 +779,7 @@ fn version_set_dynamic() -> Result<()> {
 // Should fallback to `uv --version` if this pyproject.toml isn't usable for whatever reason
 // (In this case, because tool.uv.managed = false)
 #[test]
-fn version_get_fallback() -> Result<()> {
+fn version_get_fallback_unmanaged() -> Result<()> {
     let context = TestContext::new("3.12");
 
     let pyproject_toml = context.temp_dir.child("pyproject.toml");
@@ -823,7 +823,7 @@ fn version_get_fallback() -> Result<()> {
 
 // version_get_fallback with `--short`
 #[test]
-fn version_get_fallback_short() -> Result<()> {
+fn version_get_fallback_unmanaged_short() -> Result<()> {
     let context = TestContext::new("3.12");
 
     let pyproject_toml = context.temp_dir.child("pyproject.toml");
@@ -876,7 +876,7 @@ fn version_get_fallback_short() -> Result<()> {
 
 // version_get_fallback with `--json`
 #[test]
-fn version_get_fallback_json() -> Result<()> {
+fn version_get_fallback_unmanaged_json() -> Result<()> {
     let context = TestContext::new("3.12");
 
     let pyproject_toml = context.temp_dir.child("pyproject.toml");
@@ -950,7 +950,7 @@ fn version_get_fallback_json() -> Result<()> {
 // Should error if this pyproject.toml isn't usable for whatever reason
 // and --project was passed explicitly.
 #[test]
-fn version_get_fallback_strict() -> Result<()> {
+fn version_get_fallback_unmanaged_strict() -> Result<()> {
     let context = TestContext::new("3.12");
 
     let pyproject_toml = context.temp_dir.child("pyproject.toml");
@@ -987,6 +987,25 @@ fn version_get_fallback_strict() -> Result<()> {
     managed = false
     "#
     );
+    Ok(())
+}
+
+// Should error if this pyproject.toml is missing
+// and --project was passed explicitly.
+#[test]
+fn version_get_fallback_missing_strict() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    uv_snapshot!(context.filters(), context.version()
+        .arg("--project").arg("."), @r"
+    success: false
+    exit_code: 2
+    ----- stdout -----
+
+    ----- stderr -----
+    error: No `pyproject.toml` found in current directory or any parent directory
+    ");
+
     Ok(())
 }
 
