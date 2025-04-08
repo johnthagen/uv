@@ -14,7 +14,7 @@ use uv_cache_key::CanonicalUrl;
 use uv_distribution_types::Index;
 use uv_fs::PortablePath;
 use uv_normalize::GroupName;
-use uv_pep440::{Version, VersionSpecifier, VersionSpecifiers};
+use uv_pep440::{Version, VersionParseError, VersionSpecifier, VersionSpecifiers};
 use uv_pep508::{ExtraName, MarkerTree, PackageName, Requirement, VersionOrUrl};
 
 use crate::pyproject::{DependencyType, Source};
@@ -44,6 +44,8 @@ pub enum Error {
     MalformedWorkspace,
     #[error("Expected a dependency at index {0}")]
     MissingDependency(usize),
+    #[error("Failed to parse `version` field of `pyproject.toml`")]
+    VersionParse(#[from] VersionParseError),
     #[error("Cannot perform ambiguous update; found multiple entries for `{}`:\n{}", package_name, requirements.iter().map(|requirement| format!("- `{requirement}`")).join("\n"))]
     Ambiguous {
         package_name: PackageName,
@@ -978,37 +980,24 @@ impl PyProjectTomlMut {
     }
 
     pub fn version(&mut self) -> Result<Version, Error> {
-        let project = self
+        let version = self
             .doc
-            .entry("project")
-            .or_insert(Item::Table(Table::new()))
-            .as_table()
+            .get("project")
+            .and_then(Item::as_table)
+            .and_then(|project| project.get("version"))
+            .and_then(Item::as_str)
             .ok_or(Error::MalformedWorkspace)?;
 
-        let version = project
-            .get("version")
-            .and_then(Item::as_value)
-            .and_then(Value::as_str)
-            .ok_or(Error::MalformedWorkspace)?;
-
-        Version::from_str(version).map_err(|_| Error::MalformedWorkspace)
+        Ok(Version::from_str(version)?)
     }
 
     pub fn has_dynamic_version(&mut self) -> bool {
-        let Ok(project) = self
+        let Some(dynamic) = self
             .doc
-            .entry("project")
-            .or_insert(Item::Table(Table::new()))
-            .as_table()
-            .ok_or(Error::MalformedWorkspace)
-        else {
-            return false;
-        };
-
-        let Some(dynamic) = project
-            .get("dynamic")
-            .and_then(Item::as_value)
-            .and_then(Value::as_array)
+            .get("project")
+            .and_then(Item::as_table)
+            .and_then(|project| project.get("dynamic"))
+            .and_then(Item::as_array)
         else {
             return false;
         };
@@ -1019,9 +1008,8 @@ impl PyProjectTomlMut {
     pub fn set_version(&mut self, version: &Version) -> Result<(), Error> {
         let project = self
             .doc
-            .entry("project")
-            .or_insert(Item::Table(Table::new()))
-            .as_table_mut()
+            .get_mut("project")
+            .and_then(Item::as_table_mut)
             .ok_or(Error::MalformedWorkspace)?;
         project.insert(
             "version",

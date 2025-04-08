@@ -492,7 +492,7 @@ requires-python = ">=3.12"
     myproject 1.10.31.dev10 => 2.0.0
 
     ----- stderr -----
-    warning: dev or post versions will be bumped to release versions
+    warning: prerelease information will be cleared as part of the version bump
     ");
 
     let pyproject = fs_err::read_to_string(&pyproject_toml)?;
@@ -502,6 +502,45 @@ requires-python = ">=3.12"
     [project]
     name = "myproject"
     version = "2.0.0"
+    requires-python = ">=3.12"
+    "#
+    );
+    Ok(())
+}
+
+// Bump major but the input version is a complex mess
+#[test]
+fn version_major_complex_mess() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(
+        r#"
+[project]
+name = "myproject"
+version = "1!2a3.post4.dev5+deadbeef6"
+requires-python = ">=3.12"
+"#,
+    )?;
+
+    uv_snapshot!(context.filters(), context.version()
+        .arg("--bump").arg("major"), @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    myproject 1!2a3.post4.dev5+deadbeef6 => 3
+
+    ----- stderr -----
+    warning: prerelease information will be cleared as part of the version bump
+    ");
+
+    let pyproject = fs_err::read_to_string(&pyproject_toml)?;
+    assert_snapshot!(
+        pyproject,
+    @r#"
+    [project]
+    name = "myproject"
+    version = "3"
     requires-python = ">=3.12"
     "#
     );
@@ -531,7 +570,7 @@ requires-python = ">=3.12"
     myproject 1.10.31.post10 => 2.0.0
 
     ----- stderr -----
-    warning: dev or post versions will be bumped to release versions
+    warning: prerelease information will be cleared as part of the version bump
     ");
 
     let pyproject = fs_err::read_to_string(&pyproject_toml)?;

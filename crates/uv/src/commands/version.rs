@@ -17,7 +17,7 @@ use uv_workspace::{
 
 use crate::{commands::ExitStatus, printer::Printer};
 
-/// Display version information for uv itself
+/// Display version information for uv itself (`uv self version`)
 pub(crate) fn self_version(
     short: bool,
     output_format: VersionFormat,
@@ -29,7 +29,7 @@ pub(crate) fn self_version(
     Ok(ExitStatus::Success)
 }
 
-/// Read or update project version (`uv metadata version`)
+/// Read or update project version (`uv version`)
 pub(crate) async fn project_version(
     project_dir: &Path,
     value: Option<String>,
@@ -167,10 +167,12 @@ fn print_version(
 }
 
 fn bumped_version(from: &Version, bump: VersionBump, printer: Printer) -> Result<Version> {
-    if from.is_dev() || from.is_post() {
+    // All prereleasey details "carry to 0" with every currently supported mode of `--bump`
+    // We could go out of our way to preserve epoch information but no one uses those...
+    if from.any_prerelease() || from.is_post() || from.is_local() || from.epoch() > 0 {
         writeln!(
             printer.stderr(),
-            "warning: dev or post versions will be bumped to release versions"
+            "warning: prerelease information will be cleared as part of the version bump"
         )?;
     }
 
