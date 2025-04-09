@@ -10206,6 +10206,125 @@ fn add_unsupported_git_scheme() {
     "###);
 }
 
+/// If uv receives an authentication failure from a configured index, it
+/// should not fall back to the default index.
+#[test]
+fn add_stop_index_search_early_on_auth_failure() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(indoc! { r#"
+        [project]
+        name = "foo"
+        version = "1.0.0"
+        requires-python = ">=3.11, <4"
+        dependencies = []
+
+        [[tool.uv.index]]
+        name = "my-index"
+        url = "https://pypi-proxy.fly.dev/basic-auth/simple"
+        "#
+    })?;
+
+    uv_snapshot!(context.add().arg("anyio"), @r"
+    success: false
+    exit_code: 2
+    ----- stdout -----
+
+    ----- stderr -----
+    error: Failed to fetch: `https://pypi-proxy.fly.dev/basic-auth/simple/anyio/`
+      Caused by: HTTP status client error (401 Unauthorized) for url (https://pypi-proxy.fly.dev/basic-auth/simple/anyio/)
+    "
+    );
+    Ok(())
+}
+
+/// uv should continue searching the default index if it receives an
+/// authentication failure that is specified in `ignore-error-codes`.
+#[test]
+fn add_ignore_error_codes() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(indoc! { r#"
+        [project]
+        name = "foo"
+        version = "1.0.0"
+        requires-python = ">=3.11, <4"
+        dependencies = []
+
+        [[tool.uv.index]]
+        name = "my-index"
+        url = "https://pypi-proxy.fly.dev/basic-auth/simple"
+        ignore-error-codes = [401, 403]
+        "#
+    })?;
+
+    uv_snapshot!(context.add().arg("anyio"), @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+
+    ----- stderr -----
+    Resolved 4 packages in [TIME]
+    Prepared 3 packages in [TIME]
+    Installed 3 packages in [TIME]
+     + anyio==4.3.0
+     + idna==3.6
+     + sniffio==1.3.1
+    "
+    );
+
+    context.assert_command("import anyio").success();
+    Ok(())
+}
+
+/// uv should fail to parse `pyproject.toml` if `ignore-error-codes`
+/// contains an invalid status code number.
+#[test]
+fn add_invalid_ignore_error_code() -> Result<()> {
+    let context = TestContext::new("3.12");
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(indoc! { r#"
+        [project]
+        name = "foo"
+        version = "1.0.0"
+        requires-python = ">=3.11, <4"
+        dependencies = []
+
+        [[tool.uv.index]]
+        name = "my-index"
+        url = "https://pypi-proxy.fly.dev/basic-auth/simple"
+        ignore-error-codes = [401, 403, 1234]
+        "#
+    })?;
+
+    uv_snapshot!(context.add().arg("anyio"), @r"
+    success: false
+    exit_code: 2
+    ----- stdout -----
+
+    ----- stderr -----
+    warning: Failed to parse `pyproject.toml` during settings discovery:
+      TOML parse error at line 10, column 22
+         |
+      10 | ignore-error-codes = [401, 403, 1234]
+         |                      ^^^^^^^^^^^^^^^^
+      1234 is not a valid HTTP status code
+
+    error: Failed to parse: `pyproject.toml`
+      Caused by: TOML parse error at line 10, column 22
+       |
+    10 | ignore-error-codes = [401, 403, 1234]
+       |                      ^^^^^^^^^^^^^^^^
+    1234 is not a valid HTTP status code
+    "
+    );
+
+    Ok(())
+}
+
 /// In authentication "always", the normal authentication flow should still work.
 #[test]
 fn add_auth_policy_always_with_credentials() -> Result<()> {
@@ -10391,15 +10510,12 @@ fn add_auth_policy_never_with_env_var_credentials() -> Result<()> {
         .env("UV_INDEX_MY_INDEX_USERNAME", "public")
         .env("UV_INDEX_MY_INDEX_PASSWORD", "heron"), @r"
     success: false
-    exit_code: 1
+    exit_code: 2
     ----- stdout -----
 
     ----- stderr -----
-      × No solution found when resolving dependencies:
-      ╰─▶ Because anyio was not found in the package registry and your project depends on anyio, we can conclude that your project's requirements are unsatisfiable.
-
-          hint: An index URL (https://pypi-proxy.fly.dev/basic-auth/simple) could not be queried due to a lack of valid authentication credentials (401 Unauthorized).
-      help: If you want to add the package regardless of the failed resolution, provide the `--frozen` flag to skip locking and syncing.
+    error: Failed to fetch: `https://pypi-proxy.fly.dev/basic-auth/simple/anyio/`
+      Caused by: HTTP status client error (401 Unauthorized) for url (https://pypi-proxy.fly.dev/basic-auth/simple/anyio/)
     "
     );
 
