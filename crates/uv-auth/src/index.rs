@@ -53,6 +53,7 @@ impl Display for AuthPolicy {
 // could potentially make sense for a future refactor.
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct Index {
+    pub url: Url,
     /// The root endpoint where authentication is applied.
     /// For PEP 503 endpoints, this excludes `/simple`.
     pub root_url: Url,
@@ -83,8 +84,8 @@ impl Indexes {
         // efficient search.
         self.0
             .iter()
-            .find(|index| is_url_prefix(&index.root_url, url))
-            .map(|index| &index.root_url)
+            .find(|index| is_url_prefix(&index.url, url))
+            .map(|index| &index.url)
     }
 
     /// Get the [`AuthPolicy`] for a URL.
